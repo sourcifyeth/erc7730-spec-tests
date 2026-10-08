@@ -1,0 +1,225 @@
+{
+  "$schema": "../../../schema/erc7730-tests.schema.json",
+  "$comment": "The embedded calls are transfer(0x1111..., 7000000) = 7 ITK and approve(0x2222..., 5000000) = 5 ITK on inner-token.json. A runner must load every descriptor under tests/2.0.0/descriptors/ to resolve them.",
+  "specVersion": "2.0.0",
+  "descriptor": "../descriptors/account.json",
+  "dataProvider": {
+    "tokens": {
+      "0x7730000000000000000000000000000000000051": {
+        "symbol": "ITK",
+        "decimals": 6,
+        "name": "Inner Token"
+      }
+    }
+  },
+  "tests": [
+    {
+      "id": "formats/calldata/calleePath-nested-descriptor",
+      "description": "calleePath resolves the inner descriptor; amountPath and spenderPath feed the inner @.value and @.from",
+      "spec": {
+        "section": "Display section > Embedded Calldata",
+        "quote": "The calleePath parameter defines the path to the address of the target contract. To handle this, the amountPath and/or spenderPath parameters can be used to specify these values explicitly."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000050",
+        "function": "execute(address to,uint256 value,bytes data)",
+        "args": [
+          "0x7730000000000000000000000000000000000051",
+          "0",
+          "0xa9059cbb000000000000000000000000111111111111111111111111111111111111111100000000000000000000000000000000000000000000000000000000006acfc0"
+        ]
+      },
+      "from": "0x3333333333333333333333333333333333333333",
+      "rawTx": "0x02f9010d0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000005080b8e4b61d27f60000000000000000000000007730000000000000000000000000000000000051000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000044a9059cbb000000000000000000000000111111111111111111111111111111111111111100000000000000000000000000000000000000000000000000000000006acfc000000000000000000000000000000000000000000000000000000000c0",
+      "expected": {
+        "intent": "Execute",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Target",
+            "value": "0x7730000000000000000000000000000000000051"
+          },
+          {
+            "label": "Value",
+            "value": "0 ETH"
+          },
+          {
+            "label": "Call",
+            "value": {
+              "intent": "Transfer",
+              "owner": "Inner Token",
+              "fields": [
+                {
+                  "label": "To",
+                  "value": "0x1111111111111111111111111111111111111111"
+                },
+                {
+                  "label": "Amount",
+                  "value": "7 ITK"
+                },
+                {
+                  "label": "Attached",
+                  "value": "0 ETH"
+                },
+                {
+                  "label": "Spender",
+                  "value": "0x3333333333333333333333333333333333333333"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/calldata/amountPath-non-zero",
+      "description": "the amount at amountPath is what the inner @.value shows",
+      "spec": {
+        "section": "Field formats > Bytes formats > calldata",
+        "quote": "amountPath or amount: Optional. Specifies the native currency amount associated with the calldata, if applicable. If provided, the ERC-7730 descriptor for this embedded calldata MAY reference this value using the @.value container path."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000050",
+        "value": "1000000000000000000",
+        "function": "execute(address to,uint256 value,bytes data)",
+        "args": [
+          "0x7730000000000000000000000000000000000051",
+          "250000000000000000",
+          "0xa9059cbb000000000000000000000000111111111111111111111111111111111111111100000000000000000000000000000000000000000000000000000000006acfc0"
+        ]
+      },
+      "from": "0x3333333333333333333333333333333333333333",
+      "rawTx": "0x02f901150180843b9aca00843b9aca00830f4240947730000000000000000000000000000000000050880de0b6b3a7640000b8e4b61d27f6000000000000000000000000773000000000000000000000000000000000005100000000000000000000000000000000000000000000000003782dace9d9000000000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000044a9059cbb000000000000000000000000111111111111111111111111111111111111111100000000000000000000000000000000000000000000000000000000006acfc000000000000000000000000000000000000000000000000000000000c0",
+      "expected": {
+        "intent": "Execute",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Target",
+            "value": "0x7730000000000000000000000000000000000051"
+          },
+          {
+            "label": "Value",
+            "value": "0.25 ETH"
+          },
+          {
+            "label": "Call",
+            "value": {
+              "intent": "Transfer",
+              "owner": "Inner Token",
+              "fields": [
+                {
+                  "label": "To",
+                  "value": "0x1111111111111111111111111111111111111111"
+                },
+                {
+                  "label": "Amount",
+                  "value": "7 ITK"
+                },
+                {
+                  "label": "Attached",
+                  "value": "0.25 ETH"
+                },
+                {
+                  "label": "Spender",
+                  "value": "0x3333333333333333333333333333333333333333"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/calldata/callee-constant",
+      "description": "callee given as a constant address resolves the inner descriptor",
+      "spec": {
+        "section": "Field formats > Bytes formats > calldata",
+        "quote": "calleePath or callee: A path reference or a constant value specifying the address of the contract being called."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000050",
+        "function": "executeFixed(bytes data)",
+        "args": [
+          "0xa9059cbb000000000000000000000000111111111111111111111111111111111111111100000000000000000000000000000000000000000000000000000000006acfc0"
+        ]
+      },
+      "from": "0x3333333333333333333333333333333333333333",
+      "rawTx": "0x02f8cd0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000005080b8a4fde6918300000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000044a9059cbb000000000000000000000000111111111111111111111111111111111111111100000000000000000000000000000000000000000000000000000000006acfc000000000000000000000000000000000000000000000000000000000c0",
+      "expected": {
+        "intent": "Execute on token",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Call",
+            "value": {
+              "intent": "Transfer",
+              "owner": "Inner Token",
+              "fields": [
+                {
+                  "label": "To",
+                  "value": "0x1111111111111111111111111111111111111111"
+                },
+                {
+                  "label": "Amount",
+                  "value": "7 ITK"
+                },
+                {
+                  "label": "Attached",
+                  "value": "0 ETH"
+                },
+                {
+                  "label": "Spender",
+                  "value": "0x3333333333333333333333333333333333333333"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/calldata/selector-constant",
+      "description": "selector given as a constant is used when the bytes hold the arguments without a selector",
+      "spec": {
+        "section": "Field formats > Bytes formats > calldata",
+        "quote": "selectorPath or selector: Optional. If omitted, the first 4 bytes of the calldata are used as the selector."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000050",
+        "function": "executeSel(bytes data)",
+        "args": [
+          "0x000000000000000000000000222222222222222222222222222222222222222200000000000000000000000000000000000000000000000000000000004c4b40"
+        ]
+      },
+      "rawTx": "0x02f8ad0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000005080b884fb8a185d00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000040000000000000000000000000222222222222222222222222222222222222222200000000000000000000000000000000000000000000000000000000004c4b40c0",
+      "expected": {
+        "intent": "Execute approve",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Call",
+            "value": {
+              "intent": "Approve",
+              "owner": "Inner Token",
+              "fields": [
+                {
+                  "label": "Spender",
+                  "value": "0x2222222222222222222222222222222222222222"
+                },
+                {
+                  "label": "Amount",
+                  "value": "5 ITK"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

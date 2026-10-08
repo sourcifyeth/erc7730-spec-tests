@@ -1,0 +1,379 @@
+{
+  "$schema": "../../../schema/erc7730-tests.schema.json",
+  "specVersion": "2.0.0",
+  "descriptor": "../descriptors/paths.json",
+  "dataProvider": {
+    "tokens": {
+      "0x7730000000000000000000000000000000000001": {
+        "symbol": "TKN",
+        "decimals": 6,
+        "name": "Spec Token"
+      },
+      "0x7730000000000000000000000000000000000002": {
+        "symbol": "SHARE",
+        "decimals": 18,
+        "name": "Share Token"
+      }
+    },
+    "addressNames": {
+      "0x3333333333333333333333333333333333333333": "Alice"
+    },
+    "chainNames": {
+      "1": "Ethereum Mainnet"
+    }
+  },
+  "tests": [
+    {
+      "id": "paths/roots/absolute-and-relative",
+      "description": "a path with the # root and a relative path point at the same decoded data",
+      "spec": {
+        "section": "Common concepts > Path references",
+        "quote": "Omitting the root makes the path relative to the structure being described. If there is no enclosing container, a relative path is equivalent to starting with #."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000010",
+        "function": "nested((address token,(uint256 amount,uint256 min) limits) order)",
+        "args": [
+          {
+            "token": "0x1111111111111111111111111111111111111111",
+            "limits": {
+              "amount": "500",
+              "min": "400"
+            }
+          }
+        ]
+      },
+      "rawTx": "0x02f88d0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000001080b86452c7607a000000000000000000000000111111111111111111111111111111111111111100000000000000000000000000000000000000000000000000000000000001f40000000000000000000000000000000000000000000000000000000000000190c0",
+      "expected": {
+        "intent": "Nested",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Token",
+            "value": "0x1111111111111111111111111111111111111111"
+          },
+          {
+            "label": "Amount",
+            "value": "500"
+          },
+          {
+            "label": "Minimum",
+            "value": "400"
+          }
+        ]
+      }
+    },
+    {
+      "id": "paths/array/index-and-negative-index",
+      "description": "index 0 selects the first element and index -1 the last",
+      "spec": {
+        "section": "Common concepts > Path references > Path slices",
+        "quote": "#.data.path.[0].path.[-1].to or data.path.[0].path.[-1].to refers to the field to taken from last member of path array, itself taken from first member of enclosing path array"
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000010",
+        "function": "arrayIndex(uint256[] values)",
+        "args": [
+          [
+            "10",
+            "20",
+            "30"
+          ]
+        ]
+      },
+      "rawTx": "0x02f8cd0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000001080b8a414beeaa800000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000000a0000000000000000000000000000000000000000000000000000000000000014000000000000000000000000000000000000000000000000000000000000001ec0",
+      "expected": {
+        "intent": "Array index",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "First",
+            "value": "10"
+          },
+          {
+            "label": "Last",
+            "value": "30"
+          }
+        ]
+      }
+    },
+    {
+      "id": "paths/array/all-elements",
+      "description": "the [] selector formats every element as its own field with the same label",
+      "spec": {
+        "section": "Display section > Slices in paths",
+        "quote": "A slice on an array type means that the associated field format specification or recursive structured data format specification MUST be applied to ALL the array elements part of the slice."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000010",
+        "function": "arrayAll(uint256[] values)",
+        "args": [
+          [
+            "10",
+            "20",
+            "30"
+          ]
+        ]
+      },
+      "rawTx": "0x02f8cd0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000001080b8a44168283700000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000000a0000000000000000000000000000000000000000000000000000000000000014000000000000000000000000000000000000000000000000000000000000001ec0",
+      "expected": {
+        "intent": "Array all",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Value",
+            "value": "10"
+          },
+          {
+            "label": "Value",
+            "value": "20"
+          },
+          {
+            "label": "Value",
+            "value": "30"
+          }
+        ]
+      }
+    },
+    {
+      "id": "paths/array/empty-array-no-fields",
+      "description": "the [] selector on an empty array produces no field",
+      "spec": {
+        "section": "Display section > Slices in paths",
+        "quote": "A slice on an array type means that the associated field format specification or recursive structured data format specification MUST be applied to ALL the array elements part of the slice."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000010",
+        "function": "arrayAll(uint256[] values)",
+        "args": [
+          []
+        ]
+      },
+      "rawTx": "0x02f86d0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000001080b8444168283700000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000c0",
+      "expected": {
+        "intent": "Array all",
+        "owner": "Spec Tests",
+        "fields": []
+      }
+    },
+    {
+      "id": "paths/array/slices",
+      "description": "start inclusive, end exclusive, and omitted start or end select from the beginning or to the end",
+      "spec": {
+        "section": "Common concepts > Path references",
+        "quote": "Slices selectors MUST NOT contain the optional step. Start index is inclusive, end index is exclusive. Start or end index can be omitted to indicate the beginning or end of the array."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000010",
+        "function": "arraySlices(uint256[] values)",
+        "args": [
+          [
+            "10",
+            "20",
+            "30",
+            "40",
+            "50"
+          ]
+        ]
+      },
+      "rawTx": "0x02f9010d0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000001080b8e47e9e24bf00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000005000000000000000000000000000000000000000000000000000000000000000a0000000000000000000000000000000000000000000000000000000000000014000000000000000000000000000000000000000000000000000000000000001e00000000000000000000000000000000000000000000000000000000000000280000000000000000000000000000000000000000000000000000000000000032c0",
+      "expected": {
+        "intent": "Array slices",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Middle",
+            "value": "20"
+          },
+          {
+            "label": "Middle",
+            "value": "30"
+          },
+          {
+            "label": "Head",
+            "value": "10"
+          },
+          {
+            "label": "Head",
+            "value": "20"
+          },
+          {
+            "label": "Tail",
+            "value": "40"
+          },
+          {
+            "label": "Tail",
+            "value": "50"
+          }
+        ]
+      }
+    },
+    {
+      "id": "paths/bytes/slice-as-token-path",
+      "description": "the first 20 bytes of a bytes argument are the token address",
+      "spec": {
+        "section": "Display section > Slices in paths",
+        "quote": "The tokenPath parameter uses a slice on a bytes value, indicating only the first 20 bytes should be taken as the address and used as the reference for the formatting of the corresponding token amount."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000010",
+        "function": "bytesSliceToken(bytes path,uint256 amount)",
+        "args": [
+          "0x7730000000000000000000000000000000000001000bb87730000000000000000000000000000000000002",
+          "2500000"
+        ]
+      },
+      "rawTx": "0x02f8cd0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000001080b8a4f056ca1b000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000002625a0000000000000000000000000000000000000000000000000000000000000002b7730000000000000000000000000000000000001000bb87730000000000000000000000000000000000002000000000000000000000000000000000000000000c0",
+      "expected": {
+        "intent": "Bytes slice as token",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Amount",
+            "value": "2.5 TKN"
+          }
+        ]
+      }
+    },
+    {
+      "id": "paths/bytes/slice-as-value",
+      "description": "a bytes slice from the start and from the end is formatted on its own",
+      "spec": {
+        "section": "Display section > Slices in paths",
+        "quote": "A slice on a primitive type like uint256, bytes and string means that the associated field format specification MUST only be applied to the corresponding slice of bytes of the underlying data."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000010",
+        "function": "bytesSliceValue(bytes data)",
+        "args": [
+          "0x3333333333333333333333333333333333333333000bb81111111111111111111111111111111111111111"
+        ]
+      },
+      "rawTx": "0x02f8ad0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000001080b88468168d7a0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002b3333333333333333333333333333333333333333000bb81111111111111111111111111111111111111111000000000000000000000000000000000000000000c0",
+      "expected": {
+        "intent": "Bytes slice as value",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "First address",
+            "value": "Alice"
+          },
+          {
+            "label": "Last address",
+            "value": "0x1111111111111111111111111111111111111111"
+          }
+        ]
+      }
+    },
+    {
+      "id": "paths/container/transaction-values",
+      "description": "@.from, @.value, @.to and @.chainId read the transaction container",
+      "spec": {
+        "section": "Reference > Container structure values > EVM Transaction container",
+        "quote": "@.from: The address of the sender of the transaction. @.value: The native currency value of the transaction. @.to: The destination address of the containing transaction. @.chainId: The chainId of the transaction"
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000010",
+        "value": "250000000000000000",
+        "function": "container(uint256 x)",
+        "args": [
+          "1"
+        ]
+      },
+      "from": "0x3333333333333333333333333333333333333333",
+      "rawTx": "0x02f8540180843b9aca00843b9aca00830f42409477300000000000000000000000000000000000108803782dace9d90000a42d9d1c5d0000000000000000000000000000000000000000000000000000000000000001c0",
+      "expected": {
+        "intent": "Container",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "From",
+            "value": "Alice"
+          },
+          {
+            "label": "Value",
+            "value": "0.25 ETH"
+          },
+          {
+            "label": "To",
+            "value": "0x7730000000000000000000000000000000000010"
+          },
+          {
+            "label": "Chain",
+            "value": "Ethereum Mainnet"
+          }
+        ]
+      }
+    },
+    {
+      "id": "paths/constants/constant-as-parameter",
+      "description": "a $.metadata.constants path is used as the token parameter",
+      "spec": {
+        "section": "Metadata section > constants",
+        "quote": "This key contains in a json object all the constants that can be re-used as parameters in the formatters, or that make sense in the context of this contract / message."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000010",
+        "function": "constantParam(uint256 amount)",
+        "args": [
+          "1500000000000000000"
+        ]
+      },
+      "rawTx": "0x02f84c0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000001080a43f4259f200000000000000000000000000000000000000000000000014d1120d7b160000c0",
+      "expected": {
+        "intent": "Constant parameter",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Shares",
+            "value": "1.5 SHARE"
+          }
+        ]
+      }
+    },
+    {
+      "id": "paths/value/literal-value",
+      "description": "a field with value instead of path shows the literal, in descriptor order with the other fields",
+      "spec": {
+        "section": "Display section > Field format specification > path / value",
+        "quote": "Instead of path, a literal value may be provided to display a constant without looking up a field."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000010",
+        "function": "literalValue(uint256 amount)",
+        "args": [
+          "7"
+        ]
+      },
+      "rawTx": "0x02f84c0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000001080a40b18b69a0000000000000000000000000000000000000000000000000000000000000007c0",
+      "expected": {
+        "intent": "Literal value",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Note",
+            "value": "Fixed text"
+          },
+          {
+            "label": "Number",
+            "value": "1000"
+          },
+          {
+            "label": "Amount",
+            "value": "7"
+          }
+        ]
+      }
+    }
+  ]
+}

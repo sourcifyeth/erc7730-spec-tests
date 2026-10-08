@@ -1,0 +1,146 @@
+{
+  "$schema": "../../../schema/erc7730-tests.schema.json",
+  "specVersion": "2.0.0",
+  "descriptor": "../descriptors/display.json",
+  "dataProvider": {
+    "tokens": {
+      "0x7730000000000000000000000000000000000020": {
+        "symbol": "TKN",
+        "decimals": 6,
+        "name": "Spec Token"
+      }
+    },
+    "ensNames": {
+      "0xd8da6bf26964af9d7eed9e03e53415d37aa96045": "vitalik.eth"
+    }
+  },
+  "tests": [
+    {
+      "id": "display/intent/object-form",
+      "description": "an intent given as an object is shown as is",
+      "spec": {
+        "section": "Display section > Structured data format specification > intent",
+        "quote": "A json object with a flat list of string key-value pairs, representing more complex intents. Both keys and values should be human-readable and user-friendly."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000020",
+        "function": "withdraw(uint256 amount)",
+        "args": [
+          "1000000000000000000"
+        ]
+      },
+      "rawTx": "0x02f84c0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000002080a42e1a7d4d0000000000000000000000000000000000000000000000000de0b6b3a7640000c0",
+      "expected": {
+        "intent": {
+          "Native Staking": "Withdraw",
+          "Rewards": "Consensus & Exec"
+        },
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Amount",
+            "value": "1 ETH"
+          }
+        ]
+      }
+    },
+    {
+      "id": "display/interpolatedIntent/field-container-constant-placeholders",
+      "description": "placeholders for a field, a container value and a constant are replaced by the formatted values",
+      "spec": {
+        "section": "Common concepts > Value interpolation",
+        "quote": "The wallet MUST apply the field's format and params to format the value. The wallet MUST replace the interpolation expression with the formatted value"
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000020",
+        "value": "500000000000000000",
+        "function": "send(address to,uint256 value)",
+        "args": [
+          "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+          "100000000"
+        ]
+      },
+      "rawTx": "0x02f8750180843b9aca00843b9aca00830f42409477300000000000000000000000000000000000208806f05b59d3b20000b844d0679d34000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa960450000000000000000000000000000000000000000000000000000000005f5e100c0",
+      "expected": {
+        "intent": "Send",
+        "interpolatedIntent": "Send 100 TKN to vitalik.eth with 0.5 ETH and no fee",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Amount",
+            "value": "100 TKN"
+          },
+          {
+            "label": "To",
+            "value": "vitalik.eth"
+          },
+          {
+            "label": "Value",
+            "value": "0.5 ETH"
+          },
+          {
+            "label": "Fee",
+            "value": "no fee"
+          }
+        ]
+      }
+    },
+    {
+      "id": "display/interpolatedIntent/escaped-braces",
+      "description": "doubled braces are literal braces",
+      "spec": {
+        "section": "Common concepts > Value interpolation > Escaping",
+        "quote": "To include literal curly braces in the intent text, escape them by doubling: {{ for { and }} for }."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000020",
+        "function": "escaped(uint256 amount)",
+        "args": [
+          "100"
+        ]
+      },
+      "rawTx": "0x02f84c0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000002080a4a52497900000000000000000000000000000000000000000000000000000000000000064c0",
+      "expected": {
+        "intent": "Execute",
+        "interpolatedIntent": "Execute {function} with 100 tokens",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Amount",
+            "value": "100"
+          }
+        ]
+      }
+    },
+    {
+      "id": "display/interpolatedIntent/unresolvable-placeholder-falls-back",
+      "description": "a placeholder that resolves to no field makes the wallet fall back to intent, so no interpolatedIntent is shown",
+      "spec": {
+        "section": "Common concepts > Value interpolation > Formatting behavior",
+        "quote": "If any interpolation fails (path not found, formatting error, etc.), the wallet MUST fall back to displaying the regular intent field"
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000020",
+        "function": "unresolvable(uint256 amount)",
+        "args": [
+          "100"
+        ]
+      },
+      "rawTx": "0x02f84c0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000002080a4da7f71fd0000000000000000000000000000000000000000000000000000000000000064c0",
+      "expected": {
+        "intent": "Execute",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Amount",
+            "value": "100"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "$schema": "../../../schema/spec/erc7730-v2.0.0.schema.json",
+  "$comment": "The contract is itself an ERC-20 token whose metadata comes from metadata.token, not from the data provider. Also tokenTicker, chainId, interoperableAddressName and cross-chain tokenAmount.",
+  "context": {
+    "$id": "Spec Tests: metadata",
+    "contract": {
+      "deployments": [{ "chainId": 1, "address": "0x7730000000000000000000000000000000000030" }]
+    }
+  },
+  "metadata": {
+    "owner": "Spec Tests",
+    "contractName": "Spec Stable",
+    "info": { "url": "https://example.invalid/", "deploymentDate": "2024-01-01T00:00:00Z" },
+    "token": { "name": "Spec Stablecoin", "ticker": "STABLE", "decimals": 6 }
+  },
+  "display": {
+    "formats": {
+      "transfer(address to,uint256 value)": {
+        "intent": "Send",
+        "fields": [{ "path": "value", "label": "Amount", "format": "tokenAmount", "params": { "tokenPath": "@.to" } }]
+      },
+      "setToken(address token)": {
+        "intent": "Set token",
+        "fields": [{ "path": "token", "label": "Token", "format": "tokenTicker" }]
+      },
+      "setTokenOnChain(uint256 chainId,address token)": {
+        "intent": "Set token",
+        "fields": [{ "path": "token", "label": "Token", "format": "tokenTicker", "params": { "chainIdPath": "chainId" } }]
+      },
+      "bridge(uint256 dstChainId)": {
+        "intent": "Bridge",
+        "fields": [{ "path": "dstChainId", "label": "Destination", "format": "chainId" }]
+      },
+      "sendInterop(bytes to)": {
+        "intent": "Send",
+        "fields": [{ "path": "to", "label": "To", "format": "interoperableAddressName" }]
+      },
+      "bridgeAmountPath(uint256 dstChainId,address token,uint256 amount)": {
+        "intent": "Bridge",
+        "fields": [
+          { "path": "amount", "label": "Amount", "format": "tokenAmount", "params": { "tokenPath": "token", "chainIdPath": "dstChainId" } }
+        ]
+      },
+      "bridgeAmountConst(address token,uint256 amount)": {
+        "intent": "Bridge",
+        "fields": [
+          { "path": "amount", "label": "Amount", "format": "tokenAmount", "params": { "tokenPath": "token", "chainId": 10 } }
+        ]
+      }
+    }
+  }
+}

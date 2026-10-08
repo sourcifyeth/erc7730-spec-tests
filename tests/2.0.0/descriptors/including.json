@@ -1,0 +1,29 @@
+{
+  "$schema": "../../../schema/spec/erc7730-v2.0.0.schema.json",
+  "$comment": "Binds the included interface to a contract, overrides the approve intent and threshold, appends a field to transfer, and leaves owner to the included file.",
+  "includes": "./includes/base.json",
+  "context": {
+    "$id": "Spec Tests: includes",
+    "contract": {
+      "deployments": [{ "chainId": 1, "address": "0x7730000000000000000000000000000000000060" }]
+    }
+  },
+  "metadata": {
+    "contractName": "Including Token"
+  },
+  "display": {
+    "formats": {
+      "approve(address spender,uint256 value)": {
+        "intent": "Allow",
+        "fields": [
+          { "path": "value", "params": { "threshold": "0xffffffff" } }
+        ]
+      },
+      "transfer(address to,uint256 value)": {
+        "fields": [
+          { "path": "@.chainId", "label": "Chain", "format": "chainId" }
+        ]
+      }
+    }
+  }
+}

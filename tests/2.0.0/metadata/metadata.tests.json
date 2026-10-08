@@ -1,0 +1,220 @@
+{
+  "$schema": "../../../schema/erc7730-tests.schema.json",
+  "$comment": "The data provider has no entry for the contract itself (0x...0030): its token metadata must come from metadata.token. Chain-scoped token keys use the eip155:<chainId>:<address> form.",
+  "specVersion": "2.0.0",
+  "descriptor": "../descriptors/metadata.json",
+  "dataProvider": {
+    "tokens": {
+      "0x7730000000000000000000000000000000000001": {
+        "symbol": "TKN",
+        "decimals": 6,
+        "name": "Spec Token"
+      },
+      "eip155:10:0x7730000000000000000000000000000000000001": {
+        "symbol": "OPTKN",
+        "decimals": 18,
+        "name": "Spec Token on OP"
+      }
+    },
+    "chainNames": {
+      "1": "Ethereum Mainnet",
+      "10": "OP Mainnet"
+    }
+  },
+  "tests": [
+    {
+      "id": "metadata/token/contract-is-the-token",
+      "description": "tokenPath @.to on a contract with metadata.token uses that ticker and decimals",
+      "spec": {
+        "section": "Metadata section > token",
+        "quote": "It contains the ERC-20 metadata when the contract itself does not support the optional calls to retrieve it. The ERC-20 token metadata for the contract described is in the sub-keys name, ticker and decimals and contains the values that the correponding function calls would have returned."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000030",
+        "function": "transfer(address to,uint256 value)",
+        "args": [
+          "0x1111111111111111111111111111111111111111",
+          "2500000"
+        ]
+      },
+      "rawTx": "0x02f86d0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000003080b844a9059cbb000000000000000000000000111111111111111111111111111111111111111100000000000000000000000000000000000000000000000000000000002625a0c0",
+      "expected": {
+        "intent": "Send",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Amount",
+            "value": "2.5 STABLE"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/tokenTicker/known-token",
+      "description": "tokenTicker renders the symbol of a known token",
+      "spec": {
+        "section": "Field formats > Address > tokenTicker",
+        "quote": "Display address as an ERC-20 token ticker"
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000030",
+        "function": "setToken(address token)",
+        "args": [
+          "0x7730000000000000000000000000000000000001"
+        ]
+      },
+      "rawTx": "0x02f84c0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000003080a4144fa6d70000000000000000000000007730000000000000000000000000000000000001c0",
+      "expected": {
+        "intent": "Set token",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Token",
+            "value": "TKN"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/tokenTicker/chainIdPath",
+      "description": "tokenTicker with chainIdPath resolves the ticker on that chain",
+      "spec": {
+        "section": "Field formats > Address > tokenTicker",
+        "quote": "chainIdPath or chainId: Optional. The chain on which the token is deployed (constant or path). When present, the wallet SHOULD resolve the token ticker for this chain."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000030",
+        "function": "setTokenOnChain(uint256 chainId,address token)",
+        "args": [
+          "10",
+          "0x7730000000000000000000000000000000000001"
+        ]
+      },
+      "rawTx": "0x02f86d0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000003080b844dc247d62000000000000000000000000000000000000000000000000000000000000000a0000000000000000000000007730000000000000000000000000000000000001c0",
+      "expected": {
+        "intent": "Set token",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Token",
+            "value": "OPTKN"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/chainId/chain-name",
+      "description": "chainId renders the EIP-155 chain name",
+      "spec": {
+        "section": "Field formats > Integer formats > chainId",
+        "quote": "Value is converted to a Blockchain name using EIP-155 reference values. Ethereum Mainnet: Field Value = 1"
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000030",
+        "function": "bridge(uint256 dstChainId)",
+        "args": [
+          "10"
+        ]
+      },
+      "rawTx": "0x02f84c0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000003080a490fd50b3000000000000000000000000000000000000000000000000000000000000000ac0",
+      "expected": {
+        "intent": "Bridge",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Destination",
+            "value": "OP Mainnet"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/interoperableAddressName/spec-example",
+      "description": "an ERC-7930 interoperable address renders as address@chain#checksum",
+      "spec": {
+        "section": "Field formats > Interoperable addresses > interoperableAddressName",
+        "quote": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045@eip155:1#4CA88C9C: Field Value = 0x00010000010114D8DA6BF26964AF9D7EED9E03E53415D37AA96045"
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000030",
+        "function": "sendInterop(bytes to)",
+        "args": [
+          "0x00010000010114D8DA6BF26964AF9D7EED9E03E53415D37AA96045"
+        ]
+      },
+      "rawTx": "0x02f88d0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000003080b86488b19b270000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000001b00010000010114d8da6bf26964af9d7eed9e03e53415d37aa960450000000000c0",
+      "expected": {
+        "intent": "Send",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "To",
+            "value": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045@eip155:1#4CA88C9C"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/tokenAmount/chainIdPath",
+      "description": "tokenAmount with chainIdPath resolves ticker and decimals on that chain",
+      "spec": {
+        "section": "Field formats > Integer formats > tokenAmount",
+        "quote": "chainIdPath or chainId: Optional. The chain on which the token is deployed (constant or path). When present, the wallet SHOULD resolve token metadata (ticker, decimals) for this chain."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000030",
+        "function": "bridgeAmountPath(uint256 dstChainId,address token,uint256 amount)",
+        "args": [
+          "10",
+          "0x7730000000000000000000000000000000000001",
+          "3000000000000000000"
+        ]
+      },
+      "rawTx": "0x02f88d0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000003080b864bac22207000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000773000000000000000000000000000000000000100000000000000000000000000000000000000000000000029a2241af62c0000c0",
+      "expected": {
+        "intent": "Bridge",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Amount",
+            "value": "3 OPTKN"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/tokenAmount/chainId-constant",
+      "description": "tokenAmount with a constant chainId resolves ticker and decimals on that chain",
+      "spec": {
+        "section": "Field formats > Integer formats > tokenAmount",
+        "quote": "chainIdPath or chainId: Optional. The chain on which the token is deployed (constant or path). When present, the wallet SHOULD resolve token metadata (ticker, decimals) for this chain."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000030",
+        "function": "bridgeAmountConst(address token,uint256 amount)",
+        "args": [
+          "0x7730000000000000000000000000000000000001",
+          "3000000000000000000"
+        ]
+      },
+      "rawTx": "0x02f86d0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000003080b844b369e966000000000000000000000000773000000000000000000000000000000000000100000000000000000000000000000000000000000000000029a2241af62c0000c0",
+      "expected": {
+        "intent": "Bridge",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Amount",
+            "value": "3 OPTKN"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://github.com/ethereum/ERCs/blob/master/assets/erc-7730/erc7730-v2.1.0.schema.json",
+  "$comment": "Declares 2.1.0, a newer MINOR of the 2 line, while using only 2.0.0 features. A 2.0.0 implementation must still process it.",
+  "context": {
+    "contract": { "deployments": [{ "chainId": 1, "address": "0x7730000000000000000000000000000000000070" }] }
+  },
+  "metadata": { "owner": "Spec Tests" },
+  "display": {
+    "formats": {
+      "ping(uint256 n)": { "intent": "Ping", "fields": [{ "path": "n", "label": "N", "format": "raw" }] }
+    }
+  }
+}

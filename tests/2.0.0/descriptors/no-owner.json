@@ -1,0 +1,18 @@
+{
+  "$schema": "../../../schema/spec/erc7730-v2.0.0.schema.json",
+  "$comment": "A descriptor without metadata.owner. Every metadata key is optional.",
+  "context": {
+    "contract": {
+      "deployments": [{ "chainId": 1, "address": "0x7730000000000000000000000000000000000031" }]
+    }
+  },
+  "metadata": {},
+  "display": {
+    "formats": {
+      "ping(uint256 n)": {
+        "intent": "Ping",
+        "fields": [{ "path": "n", "label": "N", "format": "raw" }]
+      }
+    }
+  }
+}
