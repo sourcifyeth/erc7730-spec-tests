@@ -1,0 +1,231 @@
+{
+  "$schema": "../../../schema/erc7730-tests.schema.json",
+  "specVersion": "2.0.0",
+  "descriptor": "../descriptors/basic-formats.json",
+  "dataProvider": {
+    "addressNames": {
+      "0x2222222222222222222222222222222222222222": "Treasury"
+    },
+    "ensNames": {
+      "0xd8da6bf26964af9d7eed9e03e53415d37aa96045": "vitalik.eth"
+    }
+  },
+  "tests": [
+    {
+      "id": "formats/addressName/no-name-renders-checksum-address",
+      "description": "an address with no trusted name renders as the ERC-55 address",
+      "spec": {
+        "section": "Field formats > Address > addressName",
+        "quote": "Display address as a trusted name if a trusted source exists, an ERC-55 formatted address otherwise."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000003",
+        "function": "send(address to)",
+        "args": [
+          "0x1111111111111111111111111111111111111111"
+        ]
+      },
+      "rawTx": "0x02f84c0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000000380a43e58c58c0000000000000000000000001111111111111111111111111111111111111111c0",
+      "expected": {
+        "intent": "Send",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "To",
+            "value": "0x1111111111111111111111111111111111111111"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/addressName/ens-name-any-source",
+      "description": "with no sources restriction an ENS name is used",
+      "spec": {
+        "section": "Field formats > Address types and sources",
+        "quote": "When omitted, a wallet MAY use any source to resolve an address."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000003",
+        "function": "send(address to)",
+        "args": [
+          "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"
+        ]
+      },
+      "rawTx": "0x02f84c0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000000380a43e58c58c000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045c0",
+      "expected": {
+        "intent": "Send",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "To",
+            "value": "vitalik.eth"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/addressName/local-name-any-source",
+      "description": "with no sources restriction a local name is used",
+      "spec": {
+        "section": "Field formats > Address types and sources",
+        "quote": "local: Address MAY be replaced with a local name trusted by user."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000003",
+        "function": "send(address to)",
+        "args": [
+          "0x2222222222222222222222222222222222222222"
+        ]
+      },
+      "rawTx": "0x02f84c0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000000380a43e58c58c0000000000000000000000002222222222222222222222222222222222222222c0",
+      "expected": {
+        "intent": "Send",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "To",
+            "value": "Treasury"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/addressName/sources-ens-only-ignores-local",
+      "description": "sources [ens] does not use a local name",
+      "spec": {
+        "section": "Field formats > Address types and sources",
+        "quote": "When specified a wallet MUST only use specified sources to resolve address names."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000003",
+        "function": "sendEns(address to)",
+        "args": [
+          "0x2222222222222222222222222222222222222222"
+        ]
+      },
+      "rawTx": "0x02f84c0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000000380a458db25660000000000000000000000002222222222222222222222222222222222222222c0",
+      "expected": {
+        "intent": "Send",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "To",
+            "value": "0x2222222222222222222222222222222222222222"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/addressName/sources-ens-only-uses-ens",
+      "description": "sources [ens] uses an ENS name",
+      "spec": {
+        "section": "Field formats > Address > addressName",
+        "quote": "vitalik.eth: Field Value 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045, types = [\"eoa\"], sources = [\"ens\"]"
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000003",
+        "function": "sendEns(address to)",
+        "args": [
+          "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"
+        ]
+      },
+      "rawTx": "0x02f84c0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000000380a458db2566000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045c0",
+      "expected": {
+        "intent": "Send",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "To",
+            "value": "vitalik.eth"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/addressName/sources-local-only-ignores-ens",
+      "description": "sources [local] does not use an ENS name",
+      "spec": {
+        "section": "Field formats > Address types and sources",
+        "quote": "When specified a wallet MUST only use specified sources to resolve address names."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000003",
+        "function": "sendLocal(address to)",
+        "args": [
+          "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"
+        ]
+      },
+      "rawTx": "0x02f84c0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000000380a4cdde4bbe000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045c0",
+      "expected": {
+        "intent": "Send",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "To",
+            "value": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/addressName/sender-address-renders-sender",
+      "description": "an address listed in senderAddress renders as Sender",
+      "spec": {
+        "section": "Field formats > Address > addressName",
+        "quote": "Sender: Field Value 0x0000000000000000000000000000000000000000, senderAddress = [\"0x0000000000000000000000000000000000000000\"]"
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000003",
+        "function": "sendSender(address to)",
+        "args": [
+          "0x0000000000000000000000000000000000000000"
+        ]
+      },
+      "rawTx": "0x02f84c0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000000380a44dccf51a0000000000000000000000000000000000000000000000000000000000000000c0",
+      "expected": {
+        "intent": "Send",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "To",
+            "value": "Sender"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/addressName/sender-address-other-value",
+      "description": "an address not listed in senderAddress renders as usual",
+      "spec": {
+        "section": "Field formats > Address > addressName",
+        "quote": "If the address pointed to by addressName is equal to one of the addresses in senderAddress, the addressName is interpreted as the sender referenced by @.from"
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000003",
+        "function": "sendSender(address to)",
+        "args": [
+          "0x1111111111111111111111111111111111111111"
+        ]
+      },
+      "rawTx": "0x02f84c0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000000380a44dccf51a0000000000000000000000001111111111111111111111111111111111111111c0",
+      "expected": {
+        "intent": "Send",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "To",
+            "value": "0x1111111111111111111111111111111111111111"
+          }
+        ]
+      }
+    }
+  ]
+}

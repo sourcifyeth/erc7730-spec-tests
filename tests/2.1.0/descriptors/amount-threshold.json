@@ -1,0 +1,39 @@
+{
+  "$schema": "../../../schema/spec/erc7730-v2.1.0.schema.json",
+  "$comment": "2.1.0 adds threshold and message to the amount format. One function reads the native value of the transaction, one reads a uint256 argument with a custom message.",
+  "context": {
+    "$id": "Spec Tests: amount threshold",
+    "contract": {
+      "deployments": [{ "chainId": 1, "address": "0x7730000000000000000000000000000000000210" }]
+    }
+  },
+  "metadata": {
+    "owner": "Spec Tests"
+  },
+  "display": {
+    "formats": {
+      "stake(uint256 shares)": {
+        "intent": "Stake",
+        "fields": [
+          {
+            "path": "@.value",
+            "label": "Amount",
+            "format": "amount",
+            "params": { "threshold": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff" }
+          }
+        ]
+      },
+      "withdraw(uint256 amount)": {
+        "intent": "Withdraw",
+        "fields": [
+          {
+            "path": "amount",
+            "label": "Amount",
+            "format": "amount",
+            "params": { "threshold": "1000000000000000000", "message": "Everything" }
+          }
+        ]
+      }
+    }
+  }
+}

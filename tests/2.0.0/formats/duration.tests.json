@@ -1,0 +1,88 @@
+{
+  "$schema": "../../../schema/erc7730-tests.schema.json",
+  "specVersion": "2.0.0",
+  "descriptor": "../descriptors/basic-formats.json",
+  "tests": [
+    {
+      "id": "formats/duration/spec-example",
+      "description": "8250 seconds render as 02:17:30",
+      "spec": {
+        "section": "Field formats > Integer formats > duration",
+        "quote": "Display int as a duration interpreted in seconds and represented as a duration HH:MM:ss. 02:17:30: Field Value = 8250"
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000003",
+        "function": "lock(uint256 seconds)",
+        "args": [
+          "8250"
+        ]
+      },
+      "rawTx": "0x02f84c0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000000380a4dd467064000000000000000000000000000000000000000000000000000000000000203ac0",
+      "expected": {
+        "intent": "Lock",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Duration",
+            "value": "02:17:30"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/duration/zero",
+      "description": "zero seconds render as 00:00:00",
+      "spec": {
+        "section": "Field formats > Integer formats > duration",
+        "quote": "represented as a duration HH:MM:ss"
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000003",
+        "function": "lock(uint256 seconds)",
+        "args": [
+          "0"
+        ]
+      },
+      "rawTx": "0x02f84c0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000000380a4dd4670640000000000000000000000000000000000000000000000000000000000000000c0",
+      "expected": {
+        "intent": "Lock",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Duration",
+            "value": "00:00:00"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/duration/more-than-99-hours",
+      "description": "hours are not capped at two digits",
+      "spec": {
+        "section": "Field formats > Integer formats > duration",
+        "quote": "represented as a duration HH:MM:ss"
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000003",
+        "function": "lock(uint256 seconds)",
+        "args": [
+          "31536000"
+        ]
+      },
+      "rawTx": "0x02f84c0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000000380a4dd4670640000000000000000000000000000000000000000000000000000000001e13380c0",
+      "expected": {
+        "intent": "Lock",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Duration",
+            "value": "8760:00:00"
+          }
+        ]
+      }
+    }
+  ]
+}

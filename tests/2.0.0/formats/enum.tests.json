@@ -1,0 +1,61 @@
+{
+  "$schema": "../../../schema/erc7730-tests.schema.json",
+  "specVersion": "2.0.0",
+  "descriptor": "../descriptors/basic-formats.json",
+  "tests": [
+    {
+      "id": "formats/enum/mapped-value",
+      "description": "a value that is a key of the enum renders its display string",
+      "spec": {
+        "section": "Field formats > Integer formats > enum",
+        "quote": "Value is converted using referenced constant enumeration values"
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000003",
+        "function": "setMode(uint8 mode)",
+        "args": [
+          "2"
+        ]
+      },
+      "rawTx": "0x02f84c0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000000380a421175b4a0000000000000000000000000000000000000000000000000000000000000002c0",
+      "expected": {
+        "intent": "Set mode",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Mode",
+            "value": "variable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/enum/first-key",
+      "description": "the first key of the enum maps too",
+      "spec": {
+        "section": "Metadata section > enums",
+        "quote": "An enum is a json object with a flat list of key / value pairs, each key being the enumeration value to replace, and the value being the display string to use instead of the enumeration value."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000003",
+        "function": "setMode(uint8 mode)",
+        "args": [
+          "1"
+        ]
+      },
+      "rawTx": "0x02f84c0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000000380a421175b4a0000000000000000000000000000000000000000000000000000000000000001c0",
+      "expected": {
+        "intent": "Set mode",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Mode",
+            "value": "stable"
+          }
+        ]
+      }
+    }
+  ]
+}

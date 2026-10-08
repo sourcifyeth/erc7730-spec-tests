@@ -1,0 +1,33 @@
+{
+  "$schema": "../../../schema/spec/erc7730-v2.0.0.schema.json",
+  "$comment": "Deployments on two chains at the same address, and an overloaded function, to test selector and deployment matching.",
+  "context": {
+    "$id": "Spec Tests: matching",
+    "contract": {
+      "deployments": [
+        { "chainId": 1, "address": "0x7730000000000000000000000000000000000004" },
+        { "chainId": 10, "address": "0x7730000000000000000000000000000000000004" }
+      ]
+    }
+  },
+  "metadata": { "owner": "Spec Tests" },
+  "display": {
+    "formats": {
+      "transfer(address to,uint256 value)": {
+        "intent": "Transfer",
+        "fields": [{ "path": "value", "label": "Amount", "format": "raw" }]
+      },
+      "transfer(address to,uint256 value,bytes data)": {
+        "intent": "Transfer with data",
+        "fields": [{ "path": "value", "label": "Amount", "format": "raw" }]
+      },
+      "configure((address target,uint256 limit) config,uint256[] weights)": {
+        "intent": "Configure",
+        "fields": [
+          { "path": "config.limit", "label": "Limit", "format": "raw" },
+          { "path": "weights.[0]", "label": "First weight", "format": "raw" }
+        ]
+      }
+    }
+  }
+}

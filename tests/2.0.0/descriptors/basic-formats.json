@@ -1,0 +1,89 @@
+{
+  "$schema": "../../../schema/spec/erc7730-v2.0.0.schema.json",
+  "$comment": "One function per format and parameter combination for the formats that need no external data besides names: raw, amount, enum, unit, duration, addressName.",
+  "context": {
+    "$id": "Spec Tests: basic formats",
+    "contract": {
+      "deployments": [{ "chainId": 1, "address": "0x7730000000000000000000000000000000000003" }]
+    }
+  },
+  "metadata": {
+    "owner": "Spec Tests",
+    "enums": {
+      "mode": { "1": "stable", "2": "variable" }
+    }
+  },
+  "display": {
+    "formats": {
+      "rawInt(uint256 a,int256 b)": {
+        "intent": "Raw integers",
+        "fields": [
+          { "path": "a", "label": "Unsigned", "format": "raw" },
+          { "path": "b", "label": "Signed", "format": "raw" }
+        ]
+      },
+      "rawAddress(address a)": {
+        "intent": "Raw address",
+        "fields": [{ "path": "a", "label": "Address", "format": "raw" }]
+      },
+      "rawString(string s)": {
+        "intent": "Raw string",
+        "fields": [{ "path": "s", "label": "Text", "format": "raw" }]
+      },
+      "nativeAmount(uint256 amount)": {
+        "intent": "Native amount",
+        "fields": [
+          { "path": "@.value", "label": "Value", "format": "amount" },
+          { "path": "amount", "label": "Amount", "format": "amount" }
+        ]
+      },
+      "setMode(uint8 mode)": {
+        "intent": "Set mode",
+        "fields": [{ "path": "mode", "label": "Mode", "format": "enum", "params": { "$ref": "$.metadata.enums.mode" } }]
+      },
+      "unitHours(uint256 v)": {
+        "intent": "Unit",
+        "fields": [{ "path": "v", "label": "Duration", "format": "unit", "params": { "base": "h" } }]
+      },
+      "unitDays(uint256 v)": {
+        "intent": "Unit",
+        "fields": [{ "path": "v", "label": "Duration", "format": "unit", "params": { "base": "d", "decimals": 1 } }]
+      },
+      "unitPrefix(uint256 v)": {
+        "intent": "Unit",
+        "fields": [{ "path": "v", "label": "Duration", "format": "unit", "params": { "base": "s", "prefix": true } }]
+      },
+      "unitPercent(uint256 v)": {
+        "intent": "Unit",
+        "fields": [{ "path": "v", "label": "Fee", "format": "unit", "params": { "base": "%", "decimals": 2 } }]
+      },
+      "lock(uint256 seconds)": {
+        "intent": "Lock",
+        "fields": [{ "path": "seconds", "label": "Duration", "format": "duration" }]
+      },
+      "send(address to)": {
+        "intent": "Send",
+        "fields": [{ "path": "to", "label": "To", "format": "addressName" }]
+      },
+      "sendEns(address to)": {
+        "intent": "Send",
+        "fields": [{ "path": "to", "label": "To", "format": "addressName", "params": { "sources": ["ens"] } }]
+      },
+      "sendLocal(address to)": {
+        "intent": "Send",
+        "fields": [{ "path": "to", "label": "To", "format": "addressName", "params": { "sources": ["local"] } }]
+      },
+      "sendSender(address to)": {
+        "intent": "Send",
+        "fields": [
+          {
+            "path": "to",
+            "label": "To",
+            "format": "addressName",
+            "params": { "senderAddress": ["0x0000000000000000000000000000000000000000"] }
+          }
+        ]
+      }
+    }
+  }
+}

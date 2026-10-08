@@ -1,0 +1,108 @@
+{
+  "$schema": "../../../schema/erc7730-tests.schema.json",
+  "$comment": "Descriptors an implementation must accept or reject before it renders anything. The error category is informative; only valid is compared.",
+  "kind": "validation",
+  "specVersion": "2.0.0",
+  "tests": [
+    {
+      "id": "validation/schema-version/major-not-implemented",
+      "description": "a $schema whose MAJOR version the wallet does not implement makes the descriptor invalid",
+      "spec": {
+        "section": "Versioning",
+        "quote": "A wallet MUST consider a descriptor invalid if the MAJOR version identified by its $schema key is not one the wallet implements, since a MAJOR version bump signals a breaking change to the schema."
+      },
+      "descriptor": "./descriptors/major-3-next.json",
+      "expected": { "valid": false, "error": "unsupported-major-version" }
+    },
+    {
+      "id": "validation/schema-version/alias-file-accepted",
+      "description": "a $schema that points at the alias file of an implemented MAJOR line is valid",
+      "spec": {
+        "section": "Versioning > Schema files and the $schema key",
+        "quote": "A descriptor MAY point at an alias file, in which case it is validated against the newest release of that MAJOR line, or at an exact-version file, in which case it pins that exact version."
+      },
+      "descriptor": "./descriptors/alias-v2.json",
+      "expected": { "valid": true }
+    },
+    {
+      "id": "validation/schema-version/exact-file-accepted",
+      "description": "a $schema that points at an exact-version file of an implemented MAJOR line is valid",
+      "spec": {
+        "section": "Versioning > Schema files and the $schema key",
+        "quote": "A descriptor MAY point at an alias file, in which case it is validated against the newest release of that MAJOR line, or at an exact-version file, in which case it pins that exact version."
+      },
+      "descriptor": "./descriptors/exact-v2-0-0.json",
+      "expected": { "valid": true }
+    },
+    {
+      "id": "validation/selector/duplicate-type-signature",
+      "description": "two format keys with the same type-only signature make the descriptor invalid",
+      "spec": {
+        "section": "Display section > Selector matching",
+        "quote": "If multiple keys share the same type-only signature, wallets MUST treat this as an invalid descriptor."
+      },
+      "descriptor": "./descriptors/duplicate-selector.json",
+      "expected": { "valid": false, "error": "duplicate-selector" }
+    },
+    {
+      "id": "validation/format-key/type-alias",
+      "description": "a format key that uses the uint alias is invalid",
+      "spec": {
+        "section": "Display section > Contract keys",
+        "quote": "Aliases (e.g., uint) are NOT permitted, commas MUST NOT be followed by spaces, and there MUST be exactly one space between each type and its parameter name."
+      },
+      "descriptor": "./descriptors/alias-type-name.json",
+      "expected": { "valid": false, "error": "invalid-format-key" }
+    },
+    {
+      "id": "validation/format-key/space-after-comma",
+      "description": "a format key with a space after a comma is invalid",
+      "spec": {
+        "section": "Display section > Contract keys",
+        "quote": "Aliases (e.g., uint) are NOT permitted, commas MUST NOT be followed by spaces, and there MUST be exactly one space between each type and its parameter name."
+      },
+      "descriptor": "./descriptors/space-after-comma.json",
+      "expected": { "valid": false, "error": "invalid-format-key" }
+    },
+    {
+      "id": "validation/format/unknown-format-name",
+      "description": "a format name that the spec does not define is invalid",
+      "spec": {
+        "section": "Field format specification > format",
+        "quote": "Indicates how the field value must be transformed for display. Supported format identifiers are listed in the Reference section."
+      },
+      "descriptor": "./descriptors/unknown-format.json",
+      "expected": { "valid": false, "error": "unknown-format" }
+    },
+    {
+      "id": "validation/reference/missing-enum",
+      "description": "an enum $ref that points at no enum is invalid",
+      "spec": {
+        "section": "Field formats > Integer formats > enum",
+        "quote": "$ref: An internal path (starting with root node $.) to an enumerations in metadata.enums"
+      },
+      "descriptor": "./descriptors/missing-enum.json",
+      "expected": { "valid": false, "error": "unresolved-reference" }
+    },
+    {
+      "id": "validation/reference/missing-definition",
+      "description": "a field $ref that points at no definition is invalid",
+      "spec": {
+        "section": "Structured data format specification > fields",
+        "quote": "A reference to a format specification in the definitions section: by declaring an object with two keys, a path key with the path to the field being formatted, and a $ref key with a path to the internal definition."
+      },
+      "descriptor": "./descriptors/missing-definition.json",
+      "expected": { "valid": false, "error": "unresolved-reference" }
+    },
+    {
+      "id": "validation/includes/missing-file",
+      "description": "an includes URL that cannot be resolved makes the descriptor invalid",
+      "spec": {
+        "section": "Organizing files",
+        "quote": "The includes top-level key is a URL pointing to an ERC-7730 file that MUST follow this specification."
+      },
+      "descriptor": "./descriptors/missing-include.json",
+      "expected": { "valid": false, "error": "unresolved-include" }
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "name": "erc7730-spec-tests",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Conformance test suite for ERC-7730 clear-signing implementations, versioned with the specification",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "check": "node tools/check.mjs",
+    "encode": "node tools/encode-call.mjs"
+  },
+  "license": "CC0-1.0",
+  "devDependencies": {
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
+    "viem": "^2.57.4"
+  }
+}

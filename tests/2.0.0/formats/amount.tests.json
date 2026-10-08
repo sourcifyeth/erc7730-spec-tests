@@ -1,0 +1,71 @@
+{
+  "$schema": "../../../schema/erc7730-tests.schema.json",
+  "specVersion": "2.0.0",
+  "descriptor": "../descriptors/basic-formats.json",
+  "tests": [
+    {
+      "id": "formats/amount/container-value-and-argument",
+      "description": "amount on @.value and on a uint256 argument both render in native currency",
+      "spec": {
+        "section": "Field formats > Integer formats > amount",
+        "quote": "Display as an amount in native currency, using best ticker / magnitude match. 0.19866144 ETH: Field value = 0x2c1c986f1c48000"
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000003",
+        "value": "0x2c1c986f1c48000",
+        "function": "nativeAmount(uint256 amount)",
+        "args": [
+          "1000000000000000000"
+        ]
+      },
+      "rawTx": "0x02f8540180843b9aca00843b9aca00830f42409477300000000000000000000000000000000000038802c1c986f1c48000a400666b5b0000000000000000000000000000000000000000000000000de0b6b3a7640000c0",
+      "expected": {
+        "intent": "Native amount",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Value",
+            "value": "0.19866144 ETH"
+          },
+          {
+            "label": "Amount",
+            "value": "1 ETH"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/amount/zero-and-one-wei",
+      "description": "zero renders as 0 ETH and one wei renders with 18 decimals",
+      "spec": {
+        "section": "Field formats > Integer formats > amount",
+        "quote": "Display as an amount in native currency, using best ticker / magnitude match"
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000003",
+        "value": "0",
+        "function": "nativeAmount(uint256 amount)",
+        "args": [
+          "1"
+        ]
+      },
+      "rawTx": "0x02f84c0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000000380a400666b5b0000000000000000000000000000000000000000000000000000000000000001c0",
+      "expected": {
+        "intent": "Native amount",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Value",
+            "value": "0 ETH"
+          },
+          {
+            "label": "Amount",
+            "value": "0.000000000000000001 ETH"
+          }
+        ]
+      }
+    }
+  ]
+}

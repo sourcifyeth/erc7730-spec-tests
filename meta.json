@@ -1,0 +1,26 @@
+{
+  "$comment": "Which commit of the ERC-7730 text and which schema file each version folder of this suite was written against. The Commit ID comes from the 'Released versions' table in ERCS/erc-7730.md of ethereum/ERCs. TBD means the table does not name a commit yet.",
+  "suiteVersion": "0.1.0",
+  "specRepository": "https://github.com/ethereum/ERCs",
+  "specPath": "ERCS/erc-7730.md",
+  "versions": {
+    "2.0.0": {
+      "status": "superseded",
+      "specCommit": "2528d6a0cd463d7309464a33889774368ab52df3",
+      "schema": "assets/erc-7730/erc7730-v2.0.0.schema.json"
+    },
+    "2.1.0": {
+      "status": "active",
+      "specCommit": "TBD",
+      "schema": "assets/erc-7730/erc7730-v2.1.0.schema.json",
+      "addsOver": "2.0.0",
+      "summary": "The amount format gains the threshold and message parameters that tokenAmount already had."
+    },
+    "next": {
+      "status": "draft",
+      "specCommit": null,
+      "schema": "assets/erc-7730/erc7730-v3.0.0-next.schema.json",
+      "summary": "Tracks the 3.0.0-next draft. Cases here are advisory and change without notice."
+    }
+  }
+}

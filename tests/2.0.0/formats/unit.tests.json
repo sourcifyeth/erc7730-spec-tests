@@ -1,0 +1,116 @@
+{
+  "$schema": "../../../schema/erc7730-tests.schema.json",
+  "$comment": "The three examples of the spec's unit table, plus a percent with decimals. No space between number and base, as the spec examples write it.",
+  "specVersion": "2.0.0",
+  "descriptor": "../descriptors/basic-formats.json",
+  "tests": [
+    {
+      "id": "formats/unit/base-only",
+      "description": "base without decimals appends the unit symbol",
+      "spec": {
+        "section": "Field formats > Integer formats > unit",
+        "quote": "10h: Field Value = 10, base = \"h\""
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000003",
+        "function": "unitHours(uint256 v)",
+        "args": [
+          "10"
+        ]
+      },
+      "rawTx": "0x02f84c0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000000380a420062809000000000000000000000000000000000000000000000000000000000000000ac0",
+      "expected": {
+        "intent": "Unit",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Duration",
+            "value": "10h"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/unit/decimals",
+      "description": "decimals divides the value by a power of ten",
+      "spec": {
+        "section": "Field formats > Integer formats > unit",
+        "quote": "1.5d: Field Value = 15, base = \"d\", decimals = 1"
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000003",
+        "function": "unitDays(uint256 v)",
+        "args": [
+          "15"
+        ]
+      },
+      "rawTx": "0x02f84c0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000000380a4885afe1d000000000000000000000000000000000000000000000000000000000000000fc0",
+      "expected": {
+        "intent": "Unit",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Duration",
+            "value": "1.5d"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/unit/si-prefix",
+      "description": "prefix true converts the value to an SI prefix in front of the base",
+      "spec": {
+        "section": "Field formats > Integer formats > unit",
+        "quote": "36ks: Field Value = 36000, base = \"s\", prefix = True"
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000003",
+        "function": "unitPrefix(uint256 v)",
+        "args": [
+          "36000"
+        ]
+      },
+      "rawTx": "0x02f84c0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000000380a4bbcd0f090000000000000000000000000000000000000000000000000000000000008ca0c0",
+      "expected": {
+        "intent": "Unit",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Duration",
+            "value": "36ks"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/unit/percent-decimals",
+      "description": "a percent base with two decimals",
+      "spec": {
+        "section": "Field formats > Integer formats > unit",
+        "quote": "Value is converted to a float using decimals (value / 10^decimals) and displayed appending the corresponding unit."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000003",
+        "function": "unitPercent(uint256 v)",
+        "args": [
+          "30"
+        ]
+      },
+      "rawTx": "0x02f84c0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000000380a4423211b2000000000000000000000000000000000000000000000000000000000000001ec0",
+      "expected": {
+        "intent": "Unit",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Fee",
+            "value": "0.3%"
+          }
+        ]
+      }
+    }
+  ]
+}

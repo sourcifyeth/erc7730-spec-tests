@@ -1,0 +1,145 @@
+{
+  "$schema": "../../../schema/erc7730-tests.schema.json",
+  "$comment": "Everything 2.1.0 adds over 2.0.0: the amount format gains threshold and message, with the same 'greater than or equal' rule as tokenAmount and the default message 'All'.",
+  "specVersion": "2.1.0",
+  "descriptor": "../descriptors/amount-threshold.json",
+  "tests": [
+    {
+      "id": "formats/amount/threshold/below-renders-amount",
+      "description": "native value below the threshold renders as an amount",
+      "spec": {
+        "section": "Field formats > Integer formats > amount",
+        "quote": "If value is greater than or equal to the optional threshold, display message instead."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000210",
+        "value": "1500000000000000000",
+        "function": "stake(uint256 shares)",
+        "args": [
+          "1"
+        ]
+      },
+      "rawTx": "0x02f8540180843b9aca00843b9aca00830f42409477300000000000000000000000000000000002108814d1120d7b160000a4a694fc3a0000000000000000000000000000000000000000000000000000000000000001c0",
+      "expected": {
+        "intent": "Stake",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Amount",
+            "value": "1.5 ETH"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/amount/threshold/equal-renders-default-message",
+      "description": "native value equal to the threshold renders the default message All",
+      "spec": {
+        "section": "Field formats > Integer formats > amount",
+        "quote": "message to display when the field value is greater than or equal to threshold. Optional, defaults to \"All\""
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000210",
+        "value": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+        "function": "stake(uint256 shares)",
+        "args": [
+          "1"
+        ]
+      },
+      "rawTx": "0x02f86c0180843b9aca00843b9aca00830f4240947730000000000000000000000000000000000210a0ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffa4a694fc3a0000000000000000000000000000000000000000000000000000000000000001c0",
+      "expected": {
+        "intent": "Stake",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Amount",
+            "value": "All"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/amount/threshold/above-renders-custom-message",
+      "description": "argument above the threshold renders the custom message",
+      "spec": {
+        "section": "Field formats > Integer formats > amount",
+        "quote": "integer value. If the field value is greater than or equal to it, the wallet displays message instead of the amount."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000210",
+        "function": "withdraw(uint256 amount)",
+        "args": [
+          "1000000000000000001"
+        ]
+      },
+      "rawTx": "0x02f84c0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000021080a42e1a7d4d0000000000000000000000000000000000000000000000000de0b6b3a7640001c0",
+      "expected": {
+        "intent": "Withdraw",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Amount",
+            "value": "Everything"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/amount/threshold/equal-renders-custom-message",
+      "description": "argument equal to the threshold renders the custom message",
+      "spec": {
+        "section": "Field formats > Integer formats > amount",
+        "quote": "integer value. If the field value is greater than or equal to it, the wallet displays message instead of the amount."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000210",
+        "function": "withdraw(uint256 amount)",
+        "args": [
+          "1000000000000000000"
+        ]
+      },
+      "rawTx": "0x02f84c0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000021080a42e1a7d4d0000000000000000000000000000000000000000000000000de0b6b3a7640000c0",
+      "expected": {
+        "intent": "Withdraw",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Amount",
+            "value": "Everything"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/amount/threshold/one-below-renders-amount",
+      "description": "argument one below the threshold renders as an amount",
+      "spec": {
+        "section": "Field formats > Integer formats > amount",
+        "quote": "integer value. If the field value is greater than or equal to it, the wallet displays message instead of the amount."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000210",
+        "function": "withdraw(uint256 amount)",
+        "args": [
+          "999999999999999999"
+        ]
+      },
+      "rawTx": "0x02f84c0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000021080a42e1a7d4d0000000000000000000000000000000000000000000000000de0b6b3a763ffffc0",
+      "expected": {
+        "intent": "Withdraw",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Amount",
+            "value": "0.999999999999999999 ETH"
+          }
+        ]
+      }
+    }
+  ]
+}

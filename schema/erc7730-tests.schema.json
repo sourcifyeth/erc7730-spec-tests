@@ -1,0 +1,323 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/sourcifyeth/erc7730-spec-tests/blob/main/schema/erc7730-tests.schema.json",
+  "title": "ERC-7730 test file",
+  "description": "A test file of the ERC-7730 spec tests. It is a superset of the registry's erc7730-tests-v2.schema.json: every registry test file is valid here. A file is either a rendering file (descriptor + cases with expected output, the default) or a validation file (kind: validation; descriptors an implementation must accept or reject).",
+  "oneOf": [
+    { "$ref": "#/definitions/renderingFile" },
+    { "$ref": "#/definitions/validationFile" }
+  ],
+  "definitions": {
+    "renderingFile": {
+      "type": "object",
+      "required": ["descriptor", "tests"],
+      "properties": {
+        "$schema": { "type": "string" },
+        "$comment": { "type": "string" },
+        "kind": { "const": "rendering" },
+        "specVersion": { "$ref": "#/definitions/specVersion" },
+        "descriptor": {
+          "type": "string",
+          "description": "Relative path to the ERC-7730 descriptor under test, resolved from the directory of the test file.",
+          "minLength": 1
+        },
+        "dataProvider": { "$ref": "#/definitions/dataProvider" },
+        "tests": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "oneOf": [
+              { "$ref": "#/definitions/calldataTest" },
+              { "$ref": "#/definitions/eip712Test" }
+            ]
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "validationFile": {
+      "type": "object",
+      "required": ["kind", "tests"],
+      "properties": {
+        "$schema": { "type": "string" },
+        "$comment": { "type": "string" },
+        "kind": { "const": "validation" },
+        "specVersion": { "$ref": "#/definitions/specVersion" },
+        "tests": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/definitions/validationTest" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "specVersion": {
+      "type": "string",
+      "description": "The spec version the file belongs to: the version key of the schema file, or 'next' for the draft. Equal to the name of the version folder.",
+      "pattern": "^([0-9]+\\.[0-9]+\\.[0-9]+(-rc\\.[0-9]+)?|next)$"
+    },
+    "caseId": {
+      "type": "string",
+      "description": "Stable identifier of the case, unique across the suite. Words joined by '-', grouped by '/'; format names keep their spec spelling (tokenAmount). Never renamed; a wrong case is removed, and its id is not reused.",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]*(/[a-zA-Z0-9][a-zA-Z0-9-]*)*$"
+    },
+    "specReference": {
+      "type": "object",
+      "description": "Where the spec requires this behaviour.",
+      "required": ["section"],
+      "properties": {
+        "section": {
+          "type": "string",
+          "description": "The heading path in ERCS/erc-7730.md, parts joined by ' > ', e.g. 'Field formats > tokenAmount'."
+        },
+        "quote": {
+          "type": "string",
+          "description": "The sentence of the spec that states the requirement, copied verbatim."
+        }
+      },
+      "additionalProperties": false
+    },
+    "until": {
+      "type": "string",
+      "description": "The first spec version in which this case no longer applies, because that version changed the behaviour. A runner that targets that version or a newer one skips the case.",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "dataProvider": {
+      "type": "object",
+      "description": "Mock data injected into the runner so cases do not need the network. Address keys are lower-case 0x-prefixed.",
+      "properties": {
+        "tokens": {
+          "type": "object",
+          "description": "Address → ERC-20 metadata. A key may be prefixed with the chain id as 'eip155:<chainId>:' when the same address means a different token on another chain.",
+          "additionalProperties": {
+            "type": "object",
+            "required": ["symbol", "decimals", "name"],
+            "properties": {
+              "symbol": { "type": "string" },
+              "decimals": { "type": "integer", "minimum": 0 },
+              "name": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "addressNames": {
+          "type": "object",
+          "description": "Address → local display name (contact labels, contract names). ENS reverse names go in ensNames so that sources: [\"local\"] matches only local labels.",
+          "additionalProperties": { "type": "string" }
+        },
+        "ensNames": {
+          "type": "object",
+          "description": "Address → ENS reverse-resolution name.",
+          "additionalProperties": { "type": "string" }
+        },
+        "nftCollectionNames": {
+          "type": "object",
+          "description": "NFT collection address → display name.",
+          "additionalProperties": { "type": "string" }
+        },
+        "blockTimestamps": {
+          "type": "object",
+          "description": "Block height (decimal string key) → Unix timestamp in seconds.",
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        },
+        "chainNames": {
+          "type": "object",
+          "description": "Chain id (decimal string key) → chain name, for the chainId format.",
+          "additionalProperties": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "call": {
+      "type": "object",
+      "description": "The decoded transaction that rawTx encodes. tools/encode-call.mjs builds rawTx from it as an unsigned EIP-1559 transaction with nonce 0, gas 1000000, maxFeePerGas 1 gwei and maxPriorityFeePerGas 1 gwei. tools/check.mjs fails when rawTx and call disagree.",
+      "required": ["chainId", "to"],
+      "properties": {
+        "chainId": { "type": "integer", "minimum": 1 },
+        "to": { "type": "string", "pattern": "^0x[0-9a-fA-F]{40}$" },
+        "value": {
+          "type": "string",
+          "description": "Native value in wei, decimal or 0x-hex string. Default 0.",
+          "pattern": "^(0x[0-9a-fA-F]+|[0-9]+)$"
+        },
+        "function": {
+          "type": "string",
+          "description": "Human-readable function signature with parameter names, as a display.formats key is written, e.g. 'transfer(address to,uint256 value)'. Omit it for a transaction with empty or opaque calldata."
+        },
+        "args": {
+          "type": "array",
+          "description": "The argument values in order. Integers as decimal or 0x-hex strings, addresses as 0x strings, bytes as 0x strings, booleans as booleans, tuples as objects keyed by component name, arrays as arrays."
+        },
+        "data": {
+          "type": "string",
+          "description": "Opaque calldata, used instead of function + args.",
+          "pattern": "^0x[0-9a-fA-F]*$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "calldataTest": {
+      "type": "object",
+      "description": "A case for a calldata descriptor.",
+      "required": ["description", "rawTx", "expected"],
+      "properties": {
+        "id": { "$ref": "#/definitions/caseId" },
+        "description": {
+          "type": "string",
+          "description": "What the case shows. Unique within the file; runners that predate id key results on it.",
+          "minLength": 1
+        },
+        "spec": { "$ref": "#/definitions/specReference" },
+        "until": { "$ref": "#/definitions/until" },
+        "call": { "$ref": "#/definitions/call" },
+        "rawTx": {
+          "type": "string",
+          "description": "Raw unsigned transaction, 0x-prefixed hex.",
+          "pattern": "^0x[0-9a-fA-F]+$"
+        },
+        "from": {
+          "type": "string",
+          "description": "Checksummed signer address. Set only when the descriptor reads @.from.",
+          "pattern": "^0x[0-9a-fA-F]{40}$"
+        },
+        "txHash": {
+          "type": "string",
+          "description": "Transaction hash, for reference only.",
+          "pattern": "^0x[0-9a-fA-F]{64}$"
+        },
+        "expected": { "$ref": "#/definitions/expected" }
+      },
+      "additionalProperties": false
+    },
+    "eip712Test": {
+      "type": "object",
+      "description": "A case for an EIP-712 descriptor.",
+      "required": ["description", "data", "expected"],
+      "properties": {
+        "id": { "$ref": "#/definitions/caseId" },
+        "description": { "type": "string", "minLength": 1 },
+        "spec": { "$ref": "#/definitions/specReference" },
+        "until": { "$ref": "#/definitions/until" },
+        "data": {
+          "type": "object",
+          "description": "Complete EIP-712 typed-data object.",
+          "required": ["types", "primaryType", "domain", "message"],
+          "properties": {
+            "types": { "type": "object" },
+            "primaryType": { "type": "string" },
+            "domain": { "type": "object" },
+            "message": { "type": "object" }
+          }
+        },
+        "from": {
+          "type": "string",
+          "description": "Checksummed signer address. Set only when the descriptor reads @.from.",
+          "pattern": "^0x[0-9a-fA-F]{40}$"
+        },
+        "expected": { "$ref": "#/definitions/expected" }
+      },
+      "additionalProperties": false
+    },
+    "expected": {
+      "oneOf": [
+        { "$ref": "#/definitions/renderedOutput" },
+        { "$ref": "#/definitions/noMatch" }
+      ]
+    },
+    "noMatch": {
+      "type": "object",
+      "description": "The descriptor must not be applied to this input. The runner reports status pass when the implementation refuses the descriptor for this input, whatever it shows instead.",
+      "required": ["match"],
+      "properties": {
+        "match": { "const": false },
+        "reason": {
+          "type": "string",
+          "description": "Which constraint fails.",
+          "enum": ["deployment", "selector", "domain", "domainSeparator", "typeHash", "schemaVersion", "mustMatch", "mapKey"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "renderedOutput": {
+      "type": "object",
+      "description": "What a wallet shows. Mirrored by cases[].rendered in results.json.",
+      "required": ["intent", "fields"],
+      "properties": {
+        "intent": {
+          "description": "The intent of the matched format: the string, or the object form copied as is.",
+          "oneOf": [
+            { "type": "string" },
+            { "type": "object", "additionalProperties": { "type": "string" } }
+          ]
+        },
+        "interpolatedIntent": {
+          "type": "string",
+          "description": "The interpolatedIntent with every {path} replaced by the formatted field value. Omit when the format has none."
+        },
+        "owner": {
+          "type": "string",
+          "description": "metadata.owner of the descriptor. Omit when the descriptor has none."
+        },
+        "fields": { "$ref": "#/definitions/fields" }
+      },
+      "additionalProperties": false
+    },
+    "fields": {
+      "type": "array",
+      "description": "Ordered list of rendered fields in descriptor order, visible ones only. value is the formatted string, or a nested renderedOutput for a calldata field whose descriptor resolved. Labels can repeat when a path iterates an array.",
+      "items": {
+        "type": "object",
+        "required": ["label", "value"],
+        "properties": {
+          "label": { "type": "string" },
+          "value": {
+            "oneOf": [
+              { "type": "string" },
+              { "$ref": "#/definitions/renderedOutput" }
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "validationTest": {
+      "type": "object",
+      "description": "A descriptor that an implementation must accept, or must reject with an error of the given category.",
+      "required": ["id", "description", "descriptor", "expected"],
+      "properties": {
+        "id": { "$ref": "#/definitions/caseId" },
+        "description": { "type": "string", "minLength": 1 },
+        "spec": { "$ref": "#/definitions/specReference" },
+        "until": { "$ref": "#/definitions/until" },
+        "descriptor": {
+          "type": "string",
+          "description": "Relative path to the descriptor, resolved from the directory of the test file.",
+          "minLength": 1
+        },
+        "expected": {
+          "type": "object",
+          "required": ["valid"],
+          "properties": {
+            "valid": { "type": "boolean" },
+            "error": {
+              "type": "string",
+              "description": "Required when valid is false. The category of the error; the message is implementation-specific.",
+              "enum": [
+                "schema",
+                "unsupported-major-version",
+                "duplicate-selector",
+                "invalid-format-key",
+                "unknown-format",
+                "unresolved-reference",
+                "invalid-path",
+                "unresolved-include"
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

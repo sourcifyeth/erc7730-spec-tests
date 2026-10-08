@@ -1,0 +1,445 @@
+{
+  "$schema": "../../../schema/erc7730-tests.schema.json",
+  "specVersion": "2.0.0",
+  "descriptor": "../descriptors/token-amount.json",
+  "dataProvider": {
+    "tokens": {
+      "0x7730000000000000000000000000000000000001": {
+        "symbol": "TKN",
+        "decimals": 6,
+        "name": "Spec Token"
+      },
+      "0x7730000000000000000000000000000000000002": {
+        "symbol": "EIGHTEEN",
+        "decimals": 18,
+        "name": "Eighteen Decimals"
+      },
+      "0x7730000000000000000000000000000000000003": {
+        "symbol": "ZERO",
+        "decimals": 0,
+        "name": "Zero Decimals"
+      }
+    }
+  },
+  "tests": [
+    {
+      "id": "formats/tokenAmount/token-path-container",
+      "description": "tokenPath @.to resolves the token from the transaction target, 6 decimals",
+      "spec": {
+        "section": "Field formats > Integer formats > tokenAmount",
+        "quote": "Convert value using token decimals, and append token ticker name."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000001",
+        "function": "transfer(address to,uint256 value)",
+        "args": [
+          "0x1111111111111111111111111111111111111111",
+          "1000000"
+        ]
+      },
+      "rawTx": "0x02f86d0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000000180b844a9059cbb000000000000000000000000111111111111111111111111111111111111111100000000000000000000000000000000000000000000000000000000000f4240c0",
+      "expected": {
+        "intent": "Send",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "To",
+            "value": "0x1111111111111111111111111111111111111111"
+          },
+          {
+            "label": "Amount",
+            "value": "1 TKN"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/tokenAmount/fractional",
+      "description": "a fractional amount keeps every significant decimal and drops trailing zeros",
+      "spec": {
+        "section": "Field formats > Integer formats > tokenAmount",
+        "quote": "Convert value using token decimals, and append token ticker name."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000001",
+        "function": "transfer(address to,uint256 value)",
+        "args": [
+          "0x1111111111111111111111111111111111111111",
+          "1234500"
+        ]
+      },
+      "rawTx": "0x02f86d0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000000180b844a9059cbb0000000000000000000000001111111111111111111111111111111111111111000000000000000000000000000000000000000000000000000000000012d644c0",
+      "expected": {
+        "intent": "Send",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "To",
+            "value": "0x1111111111111111111111111111111111111111"
+          },
+          {
+            "label": "Amount",
+            "value": "1.2345 TKN"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/tokenAmount/smallest-unit",
+      "description": "one smallest unit renders with leading zeros after the point",
+      "spec": {
+        "section": "Field formats > Integer formats > tokenAmount",
+        "quote": "Convert value using token decimals, and append token ticker name."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000001",
+        "function": "transfer(address to,uint256 value)",
+        "args": [
+          "0x1111111111111111111111111111111111111111",
+          "1"
+        ]
+      },
+      "rawTx": "0x02f86d0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000000180b844a9059cbb00000000000000000000000011111111111111111111111111111111111111110000000000000000000000000000000000000000000000000000000000000001c0",
+      "expected": {
+        "intent": "Send",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "To",
+            "value": "0x1111111111111111111111111111111111111111"
+          },
+          {
+            "label": "Amount",
+            "value": "0.000001 TKN"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/tokenAmount/zero",
+      "description": "zero renders as 0 with the ticker",
+      "spec": {
+        "section": "Field formats > Integer formats > tokenAmount",
+        "quote": "Convert value using token decimals, and append token ticker name."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000001",
+        "function": "transfer(address to,uint256 value)",
+        "args": [
+          "0x1111111111111111111111111111111111111111",
+          "0"
+        ]
+      },
+      "rawTx": "0x02f86d0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000000180b844a9059cbb00000000000000000000000011111111111111111111111111111111111111110000000000000000000000000000000000000000000000000000000000000000c0",
+      "expected": {
+        "intent": "Send",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "To",
+            "value": "0x1111111111111111111111111111111111111111"
+          },
+          {
+            "label": "Amount",
+            "value": "0 TKN"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/tokenAmount/threshold/equal-renders-default-message",
+      "description": "value equal to the threshold renders the default message Unlimited with the ticker",
+      "spec": {
+        "section": "Field formats > Integer formats > tokenAmount",
+        "quote": "message to display when the field value is greater than or equal to threshold. Optional, defaults to \"Unlimited\""
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000001",
+        "function": "approve(address spender,uint256 value)",
+        "args": [
+          "0x1111111111111111111111111111111111111111",
+          "0xffffffff"
+        ]
+      },
+      "rawTx": "0x02f86d0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000000180b844095ea7b3000000000000000000000000111111111111111111111111111111111111111100000000000000000000000000000000000000000000000000000000ffffffffc0",
+      "expected": {
+        "intent": "Approve",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Spender",
+            "value": "0x1111111111111111111111111111111111111111"
+          },
+          {
+            "label": "Amount",
+            "value": "Unlimited TKN"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/tokenAmount/threshold/above-renders-default-message",
+      "description": "value above the threshold renders the default message",
+      "spec": {
+        "section": "Field formats > Integer formats > tokenAmount",
+        "quote": "If value is greater than or equal to the optional threshold, display message with ticker instead."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000001",
+        "function": "approve(address spender,uint256 value)",
+        "args": [
+          "0x1111111111111111111111111111111111111111",
+          "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+        ]
+      },
+      "rawTx": "0x02f86d0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000000180b844095ea7b30000000000000000000000001111111111111111111111111111111111111111ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc0",
+      "expected": {
+        "intent": "Approve",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Spender",
+            "value": "0x1111111111111111111111111111111111111111"
+          },
+          {
+            "label": "Amount",
+            "value": "Unlimited TKN"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/tokenAmount/threshold/one-below-renders-amount",
+      "description": "value one below the threshold renders as an amount",
+      "spec": {
+        "section": "Field formats > Integer formats > tokenAmount",
+        "quote": "If value is greater than or equal to the optional threshold, display message with ticker instead."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000001",
+        "function": "approve(address spender,uint256 value)",
+        "args": [
+          "0x1111111111111111111111111111111111111111",
+          "0xfffffffe"
+        ]
+      },
+      "rawTx": "0x02f86d0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000000180b844095ea7b3000000000000000000000000111111111111111111111111111111111111111100000000000000000000000000000000000000000000000000000000fffffffec0",
+      "expected": {
+        "intent": "Approve",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Spender",
+            "value": "0x1111111111111111111111111111111111111111"
+          },
+          {
+            "label": "Amount",
+            "value": "4294.967294 TKN"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/tokenAmount/threshold/custom-message",
+      "description": "the message parameter replaces Unlimited",
+      "spec": {
+        "section": "Field formats > Integer formats > tokenAmount",
+        "quote": "Max DAI: Field value = 0xFFFFFFFF, tokenPath = DAI, threshold \"0xFFFFFFFF\", message = \"Max\""
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000001",
+        "function": "approveMax(address spender,uint256 value)",
+        "args": [
+          "0x1111111111111111111111111111111111111111",
+          "0xffffffff"
+        ]
+      },
+      "rawTx": "0x02f86d0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000000180b844c0bbc868000000000000000000000000111111111111111111111111111111111111111100000000000000000000000000000000000000000000000000000000ffffffffc0",
+      "expected": {
+        "intent": "Approve",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Amount",
+            "value": "Max TKN"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/tokenAmount/token-path-argument",
+      "description": "tokenPath that points at an argument resolves that token, 18 decimals",
+      "spec": {
+        "section": "Field formats > Integer formats > tokenAmount",
+        "quote": "tokenPath or token: Path reference, or constant value for the address of the token contract. Used to associate correct ticker."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000001",
+        "function": "deposit(address token,uint256 amount)",
+        "args": [
+          "0x7730000000000000000000000000000000000002",
+          "2500000000000000000"
+        ]
+      },
+      "rawTx": "0x02f86d0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000000180b84447e7ef24000000000000000000000000773000000000000000000000000000000000000200000000000000000000000000000000000000000000000022b1c8c1227a0000c0",
+      "expected": {
+        "intent": "Deposit",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Amount",
+            "value": "2.5 EIGHTEEN"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/tokenAmount/zero-decimals",
+      "description": "a token with 0 decimals renders the integer as is",
+      "spec": {
+        "section": "Field formats > Integer formats > tokenAmount",
+        "quote": "Convert value using token decimals, and append token ticker name."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000001",
+        "function": "deposit(address token,uint256 amount)",
+        "args": [
+          "0x7730000000000000000000000000000000000003",
+          "42"
+        ]
+      },
+      "rawTx": "0x02f86d0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000000180b84447e7ef240000000000000000000000007730000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000002ac0",
+      "expected": {
+        "intent": "Deposit",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Amount",
+            "value": "42 ZERO"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/tokenAmount/native-currency-address-constant-path",
+      "description": "nativeCurrencyAddress given as a $.metadata.constants path turns the amount into native currency",
+      "spec": {
+        "section": "Field formats > Integer formats > tokenAmount",
+        "quote": "If the address pointed to by tokenPath is equal to one of the addresses in nativeCurrencyAddress, the tokenAmount is interpreted as expressed in native currency"
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000001",
+        "function": "deposit(address token,uint256 amount)",
+        "args": [
+          "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+          "2000000000000000"
+        ]
+      },
+      "rawTx": "0x02f86d0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000000180b84447e7ef24000000000000000000000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee00000000000000000000000000000000000000000000000000071afd498d0000c0",
+      "expected": {
+        "intent": "Deposit",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Amount",
+            "value": "0.002 ETH"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/tokenAmount/native-currency-address-list",
+      "description": "nativeCurrencyAddress given as a list matches any of its addresses",
+      "spec": {
+        "section": "Field formats > Integer formats > tokenAmount",
+        "quote": "nativeCurrencyAddress: Either a string or an array of strings."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000001",
+        "function": "depositList(address token,uint256 amount)",
+        "args": [
+          "0x0000000000000000000000000000000000000000",
+          "1000000000000000000"
+        ]
+      },
+      "rawTx": "0x02f86d0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000000180b8445af2466700000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000de0b6b3a7640000c0",
+      "expected": {
+        "intent": "Deposit",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Amount",
+            "value": "1 ETH"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/tokenAmount/native-currency-address-no-match",
+      "description": "a token address that is not in nativeCurrencyAddress renders as that token",
+      "spec": {
+        "section": "Field formats > Integer formats > tokenAmount",
+        "quote": "If the address pointed to by tokenPath is equal to one of the addresses in nativeCurrencyAddress, the tokenAmount is interpreted as expressed in native currency"
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000001",
+        "function": "depositList(address token,uint256 amount)",
+        "args": [
+          "0x7730000000000000000000000000000000000002",
+          "1000000000000000000"
+        ]
+      },
+      "rawTx": "0x02f86d0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000000180b8445af2466700000000000000000000000077300000000000000000000000000000000000020000000000000000000000000000000000000000000000000de0b6b3a7640000c0",
+      "expected": {
+        "intent": "Deposit",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Amount",
+            "value": "1 EIGHTEEN"
+          }
+        ]
+      }
+    },
+    {
+      "id": "formats/tokenAmount/token-constant",
+      "description": "token given as a constant address resolves that token",
+      "spec": {
+        "section": "Field formats > Integer formats > tokenAmount",
+        "quote": "tokenPath or token: Path reference, or constant value for the address of the token contract."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000001",
+        "function": "mint(uint256 amount)",
+        "args": [
+          "123456789000000000000"
+        ]
+      },
+      "rawTx": "0x02f84c0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000000180a4a0712d68000000000000000000000000000000000000000000000006b14e9f7e4f5a5000c0",
+      "expected": {
+        "intent": "Mint",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Amount",
+            "value": "123.456789 EIGHTEEN"
+          }
+        ]
+      }
+    }
+  ]
+}

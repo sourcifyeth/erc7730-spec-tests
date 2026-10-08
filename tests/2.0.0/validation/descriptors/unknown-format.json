@@ -1,0 +1,6 @@
+{
+  "$schema": "https://github.com/ethereum/ERCs/blob/master/assets/erc-7730/erc7730-v2.schema.json",
+  "context": { "contract": { "deployments": [{ "chainId": 1, "address": "0x7730000000000000000000000000000000000006" }] } },
+  "metadata": { "owner": "Spec Tests" },
+  "display": { "formats": { "transfer(address to,uint256 value)": { "intent": "Transfer", "fields": [{ "path": "value", "label": "Amount", "format": "number" }] } } }
+}
