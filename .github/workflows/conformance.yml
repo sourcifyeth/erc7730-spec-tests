@@ -1,0 +1,125 @@
+name: Conformance report
+
+# Runs every known implementation over the whole suite and commits one report to
+# the reports branch. See docs/report-format.md. The viewer reads latest.json from
+# there.
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['tests/**', 'meta.json', 'tools/**', '.github/workflows/conformance.yml']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: conformance-report
+  cancel-in-progress: false
+
+jobs:
+  sourcify:
+    name: Run Sourcify clear-signing
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: sourcifyeth/clear-signing-test-runner
+          ref: dae3cdabd0eab26173d7f7a31a2ca7e75bf07daf # v0.2.2 main @ 2026-08-06
+          path: runner
+          persist-credentials: false
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: '22'
+      - name: Build the runner
+        working-directory: runner
+        run: npm ci && npm run build
+      - name: Run the suite
+        run: node tools/run-suite.mjs --out results/sourcify --cmd 'node runner/dist/cli.js {file} --output {out}'
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
+        with:
+          name: results-sourcify
+          path: results/sourcify
+          if-no-files-found: error
+
+  rust:
+    name: Run Rust cs-test (llbartekll/clear-signing)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: llbartekll/clear-signing
+          ref: dc158b13b13a325f378577453ae3d3d6aef3ab2d # main @ 2026-09-25
+          path: runner
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
+        with:
+          workspaces: runner
+      - name: Install cs-test
+        working-directory: runner
+        run: cargo install --path crates/cs-test --locked
+      - name: Run the suite
+        run: node tools/run-suite.mjs --out results/rust --cmd 'cs-test run {file} --registry {descriptors} --output {out}'
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
+        with:
+          name: results-rust
+          path: results/rust
+          if-no-files-found: error
+
+  report:
+    name: Build and publish the report
+    needs: [sourcify, rust]
+    if: always() && !cancelled()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6
+        with:
+          pattern: results-*
+          path: results
+      - name: Flatten artifact directories
+        run: |
+          for d in results/results-*; do mv "$d" "results/${d#results/results-}"; done
+          ls results
+      - name: Checkout the reports branch
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: reports
+          path: reports
+          persist-credentials: true
+        continue-on-error: true
+      - name: Create the reports branch when it does not exist
+        run: |
+          if [ ! -d reports/.git ]; then
+            git init -q -b reports reports
+            git -C reports remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Build the report
+        run: |
+          node tools/build-report.mjs --results results --out reports \
+            --run-id "${{ github.run_id }}" \
+            --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            --suite-commit "${{ github.sha }}"
+      - name: Commit and push
+        working-directory: reports
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -q -m "report: run ${{ github.run_id }} on suite ${{ github.sha }}" || { echo 'nothing to commit'; exit 0; }
+          git push origin HEAD:reports

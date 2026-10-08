@@ -95,6 +95,19 @@ node dist/cli.js tests/2.1.0/formats/amount-threshold.tests.json --output result
 
 A runner reports one of four statuses per case: `pass`, `fail`, `error`, `skipped`. A skip must carry a message that says why. Skips count as not passing, but the report shows the reason, so "we do not support `calldata` yet" reads differently from a wrong result.
 
+## The conformance report
+
+A workflow ([`conformance.yml`](.github/workflows/conformance.yml)) runs every known implementation over the whole suite each night, on every push to `main` that touches the tests, and on request. It builds one `report.json` with [`tools/build-report.mjs`](tools/build-report.mjs) and commits it to the `reports` branch, with one badge file per implementation and spec version. The format is in [`docs/report-format.md`](docs/report-format.md). The viewer that shows the report lives in [`sourcifyeth/erc7730-spec-tests-report`](https://github.com/sourcifyeth/erc7730-spec-tests-report).
+
+To add an implementation, add a job to the workflow that builds its runner and calls `tools/run-suite.mjs` with the runner's command line. The job's artifact name, `results-<id>`, becomes the implementation id in the report.
+
+To build a report locally:
+
+```sh
+node tools/run-suite.mjs --out results/sourcify --cmd 'node ../clear-signing-test-runner/dist/cli.js {file} --output {out}'
+node tools/build-report.mjs --results results --out report
+```
+
 ## Versioning and releases
 
 - A folder is named after the spec version it covers, as the `version` key of the schema file names it. `meta.json` records the commit of the ERC text each folder was written against.
