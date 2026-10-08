@@ -1,0 +1,33 @@
+{
+  "$schema": "../../../schema/erc7730-tests.schema.json",
+  "specVersion": "2.0.0",
+  "descriptor": "../descriptors/no-owner.json",
+  "tests": [
+    {
+      "id": "metadata/owner/absent",
+      "description": "a descriptor without metadata.owner renders with no owner",
+      "spec": {
+        "section": "Metadata section",
+        "quote": "All keys are optional."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000031",
+        "function": "ping(uint256 n)",
+        "args": [
+          "1"
+        ]
+      },
+      "rawTx": "0x02f84c0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000003180a4773acdef0000000000000000000000000000000000000000000000000000000000000001c0",
+      "expected": {
+        "intent": "Ping",
+        "fields": [
+          {
+            "label": "N",
+            "value": "1"
+          }
+        ]
+      }
+    }
+  ]
+}

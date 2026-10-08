@@ -1,0 +1,123 @@
+{
+  "$schema": "../../../schema/spec/erc7730-v2.0.0.schema.json",
+  "$comment": "One function per display feature: intent forms, interpolation, definitions, groups, iteration, order, visibility rules, array parameters, $id keys.",
+  "context": {
+    "$id": "Spec Tests: display",
+    "contract": {
+      "deployments": [{ "chainId": 1, "address": "0x7730000000000000000000000000000000000020" }]
+    }
+  },
+  "metadata": {
+    "owner": "Spec Tests",
+    "constants": {
+      "feeNote": "no fee"
+    }
+  },
+  "display": {
+    "definitions": {
+      "sendAmount": {
+        "label": "Amount to send",
+        "format": "tokenAmount",
+        "params": { "tokenPath": "@.to", "threshold": "0xffffffff", "message": "Unlimited" }
+      }
+    },
+    "formats": {
+      "withdraw(uint256 amount)": {
+        "intent": { "Native Staking": "Withdraw", "Rewards": "Consensus & Exec" },
+        "fields": [{ "path": "amount", "label": "Amount", "format": "amount" }]
+      },
+      "send(address to,uint256 value)": {
+        "intent": "Send",
+        "interpolatedIntent": "Send {value} to {to} with {@.value} and {$.metadata.constants.feeNote}",
+        "fields": [
+          { "path": "value", "label": "Amount", "format": "tokenAmount", "params": { "tokenPath": "@.to" } },
+          { "path": "to", "label": "To", "format": "addressName" },
+          { "path": "@.value", "label": "Value", "format": "amount" },
+          { "path": "$.metadata.constants.feeNote", "label": "Fee", "format": "raw" }
+        ]
+      },
+      "escaped(uint256 amount)": {
+        "intent": "Execute",
+        "interpolatedIntent": "Execute {{function}} with {amount} tokens",
+        "fields": [{ "path": "amount", "label": "Amount", "format": "raw" }]
+      },
+      "unresolvable(uint256 amount)": {
+        "intent": "Execute",
+        "interpolatedIntent": "Execute with {missing}",
+        "fields": [{ "path": "amount", "label": "Amount", "format": "raw" }]
+      },
+      "transfer(address to,uint256 value)": {
+        "intent": "Transfer",
+        "fields": [{ "path": "value", "$ref": "$.display.definitions.sendAmount" }]
+      },
+      "transferMax(address to,uint256 value)": {
+        "intent": "Transfer",
+        "fields": [{ "path": "value", "$ref": "$.display.definitions.sendAmount", "params": { "message": "Max" } }]
+      },
+      "submit((address token,uint256 amount) order,bytes32 salt)": {
+        "intent": "Submit",
+        "fields": [
+          {
+            "path": "order",
+            "fields": [
+              { "path": "amount", "label": "Amount", "format": "raw" },
+              { "path": "token", "label": "Token", "format": "raw" }
+            ]
+          }
+        ]
+      },
+      "distributeBundled(address[] recipients,uint256[] percentages)": {
+        "intent": "Distribute",
+        "fields": [
+          {
+            "iteration": "bundled",
+            "fields": [
+              { "path": "recipients.[]", "label": "Recipient", "format": "raw" },
+              { "path": "percentages.[]", "label": "Share", "format": "unit", "params": { "base": "%" } }
+            ]
+          }
+        ]
+      },
+      "distributeSequential(address[] recipients,uint256[] percentages)": {
+        "intent": "Distribute",
+        "fields": [
+          {
+            "iteration": "sequential",
+            "fields": [
+              { "path": "recipients.[]", "label": "Recipient", "format": "raw" },
+              { "path": "percentages.[]", "label": "Share", "format": "unit", "params": { "base": "%" } }
+            ]
+          }
+        ]
+      },
+      "ordered(uint256 first,uint256 second,uint256 third)": {
+        "intent": "Ordered",
+        "fields": [
+          { "path": "third", "label": "Third", "format": "raw" },
+          { "path": "first", "label": "First", "format": "raw" },
+          { "path": "second", "label": "Second", "format": "raw" }
+        ]
+      },
+      "visibility(uint256 shown,uint256 hidden,uint256 fee,uint256 legacy)": {
+        "intent": "Visibility",
+        "fields": [
+          { "path": "shown", "label": "Shown", "format": "raw", "visible": "always" },
+          { "path": "hidden", "label": "Hidden", "format": "raw", "visible": "never" },
+          { "path": "fee", "label": "Fee", "format": "raw", "visible": { "ifNotIn": [0] } },
+          { "path": "legacy", "label": "Legacy", "format": "raw", "visible": { "mustMatch": [0, 1] } }
+        ]
+      },
+      "multi(address[] tokens,uint256[] amounts)": {
+        "intent": "Multi",
+        "fields": [
+          { "path": "amounts.[]", "label": "Amount", "format": "tokenAmount", "params": { "tokenPath": "tokens.[]" } }
+        ]
+      },
+      "identified(uint256 amount)": {
+        "$id": "This id is internal",
+        "intent": "Identified",
+        "fields": [{ "$id": "internal field id", "path": "amount", "label": "Amount", "format": "raw" }]
+      }
+    }
+  }
+}

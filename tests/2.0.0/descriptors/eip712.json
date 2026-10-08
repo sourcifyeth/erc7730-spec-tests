@@ -1,0 +1,31 @@
+{
+  "$schema": "../../../schema/spec/erc7730-v2.0.0.schema.json",
+  "$comment": "An EIP-712 binding with a domain name constraint and deployments. One flat message type and one with a nested struct.",
+  "context": {
+    "$id": "Spec Tests: EIP-712",
+    "eip712": {
+      "domain": { "name": "Spec Tests" },
+      "deployments": [{ "chainId": 1, "address": "0x7730000000000000000000000000000000000040" }]
+    }
+  },
+  "metadata": { "owner": "Spec Tests" },
+  "display": {
+    "formats": {
+      "Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)": {
+        "intent": "Permit",
+        "fields": [
+          { "path": "spender", "label": "Spender", "format": "addressName" },
+          { "path": "value", "label": "Amount", "format": "tokenAmount", "params": { "tokenPath": "@.to" } },
+          { "path": "nonce", "label": "Nonce", "format": "raw" }
+        ]
+      },
+      "Order(Asset asset,address maker)Asset(address token,uint256 amount)": {
+        "intent": "Order",
+        "fields": [
+          { "path": "asset.amount", "label": "Amount", "format": "tokenAmount", "params": { "tokenPath": "asset.token" } },
+          { "path": "maker", "label": "Maker", "format": "addressName" }
+        ]
+      }
+    }
+  }
+}

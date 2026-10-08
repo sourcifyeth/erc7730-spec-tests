@@ -1,0 +1,399 @@
+{
+  "$schema": "../../../schema/erc7730-tests.schema.json",
+  "specVersion": "2.0.0",
+  "descriptor": "../descriptors/display.json",
+  "dataProvider": {
+    "tokens": {
+      "0x7730000000000000000000000000000000000020": {
+        "symbol": "TKN",
+        "decimals": 6,
+        "name": "Spec Token"
+      },
+      "0x7730000000000000000000000000000000000001": {
+        "symbol": "AAA",
+        "decimals": 6,
+        "name": "Token A"
+      },
+      "0x7730000000000000000000000000000000000002": {
+        "symbol": "BBB",
+        "decimals": 18,
+        "name": "Token B"
+      }
+    }
+  },
+  "tests": [
+    {
+      "id": "display/definitions/ref-uses-definition",
+      "description": "a field that references a definition takes its label, format and params",
+      "spec": {
+        "section": "Display section > Structured data format specification > fields",
+        "quote": "A reference to a format specification in the definitions section: by declaring an object with two keys, a path key with the path to the field being formatted, and a $ref key with a path to the internal definition."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000020",
+        "function": "transfer(address to,uint256 value)",
+        "args": [
+          "0x1111111111111111111111111111111111111111",
+          "0xffffffff"
+        ]
+      },
+      "rawTx": "0x02f86d0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000002080b844a9059cbb000000000000000000000000111111111111111111111111111111111111111100000000000000000000000000000000000000000000000000000000ffffffffc0",
+      "expected": {
+        "intent": "Transfer",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Amount to send",
+            "value": "Unlimited TKN"
+          }
+        ]
+      }
+    },
+    {
+      "id": "display/definitions/ref-params-override",
+      "description": "params on the reference take precedence over the params of the definition",
+      "spec": {
+        "section": "Display section > Structured data format specification > fields",
+        "quote": "A reference object can override a field format specification params by including its own params sub-key, whose values will take precedence over the common definition"
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000020",
+        "function": "transferMax(address to,uint256 value)",
+        "args": [
+          "0x1111111111111111111111111111111111111111",
+          "0xffffffff"
+        ]
+      },
+      "rawTx": "0x02f86d0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000002080b844ae47751b000000000000000000000000111111111111111111111111111111111111111100000000000000000000000000000000000000000000000000000000ffffffffc0",
+      "expected": {
+        "intent": "Transfer",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Amount to send",
+            "value": "Max TKN"
+          }
+        ]
+      }
+    },
+    {
+      "id": "display/groups/path-prefix",
+      "description": "a group with a path prefixes the paths of its fields",
+      "spec": {
+        "section": "Display section > Group format specification",
+        "quote": "Recursive path references work by concatenating the paths of the parents structured data format specification, all the way to the leaf, to build a full reference path to the field being described."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000020",
+        "function": "submit((address token,uint256 amount) order,bytes32 salt)",
+        "args": [
+          {
+            "token": "0x1111111111111111111111111111111111111111",
+            "amount": "42"
+          },
+          "0x0000000000000000000000000000000000000000000000000000000000000001"
+        ]
+      },
+      "rawTx": "0x02f88d0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000002080b8644e93d7b00000000000000000000000001111111111111111111111111111111111111111000000000000000000000000000000000000000000000000000000000000002a0000000000000000000000000000000000000000000000000000000000000001c0",
+      "expected": {
+        "intent": "Submit",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Amount",
+            "value": "42"
+          },
+          {
+            "label": "Token",
+            "value": "0x1111111111111111111111111111111111111111"
+          }
+        ]
+      }
+    },
+    {
+      "id": "display/groups/iteration-bundled",
+      "description": "bundled iteration interleaves the elements of the arrays",
+      "spec": {
+        "section": "Display section > Group format specification > iteration",
+        "quote": "In bundled mode, elements of the arrays gets bundled together - array_0[0] array_1[0] array_0[1] array_1[1] .. array_0[N] array_1[N]"
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000020",
+        "function": "distributeBundled(address[] recipients,uint256[] percentages)",
+        "args": [
+          [
+            "0x1111111111111111111111111111111111111111",
+            "0x2222222222222222222222222222222222222222"
+          ],
+          [
+            "60",
+            "40"
+          ]
+        ]
+      },
+      "rawTx": "0x02f9012e0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000002080b90104ac2d4e98000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000002000000000000000000000000111111111111111111111111111111111111111100000000000000000000000022222222222222222222222222222222222222220000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000003c0000000000000000000000000000000000000000000000000000000000000028c0",
+      "expected": {
+        "intent": "Distribute",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Recipient",
+            "value": "0x1111111111111111111111111111111111111111"
+          },
+          {
+            "label": "Share",
+            "value": "60%"
+          },
+          {
+            "label": "Recipient",
+            "value": "0x2222222222222222222222222222222222222222"
+          },
+          {
+            "label": "Share",
+            "value": "40%"
+          }
+        ]
+      }
+    },
+    {
+      "id": "display/groups/iteration-sequential",
+      "description": "sequential iteration shows each array in full, one after the other",
+      "spec": {
+        "section": "Display section > Group format specification > iteration",
+        "quote": "In sequential mode, arrays are displayed fully one after the other - array_0[0] array_0[1] .. array_0[N] array_1[0] array_1[1] .. array_1[M]"
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000020",
+        "function": "distributeSequential(address[] recipients,uint256[] percentages)",
+        "args": [
+          [
+            "0x1111111111111111111111111111111111111111",
+            "0x2222222222222222222222222222222222222222"
+          ],
+          [
+            "60",
+            "40"
+          ]
+        ]
+      },
+      "rawTx": "0x02f9012e0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000002080b90104c2617cb0000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000002000000000000000000000000111111111111111111111111111111111111111100000000000000000000000022222222222222222222222222222222222222220000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000003c0000000000000000000000000000000000000000000000000000000000000028c0",
+      "expected": {
+        "intent": "Distribute",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Recipient",
+            "value": "0x1111111111111111111111111111111111111111"
+          },
+          {
+            "label": "Recipient",
+            "value": "0x2222222222222222222222222222222222222222"
+          },
+          {
+            "label": "Share",
+            "value": "60%"
+          },
+          {
+            "label": "Share",
+            "value": "40%"
+          }
+        ]
+      }
+    },
+    {
+      "id": "display/order/descriptor-order-not-argument-order",
+      "description": "fields appear in the order of the descriptor, not the order of the function arguments",
+      "spec": {
+        "section": "Display section > Group format specification",
+        "quote": "Wallets SHOULD display fields in the order in which they appear in the group defintion. For this grouping purpose, the top level Structured data format specification is also considered a group."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000020",
+        "function": "ordered(uint256 first,uint256 second,uint256 third)",
+        "args": [
+          "1",
+          "2",
+          "3"
+        ]
+      },
+      "rawTx": "0x02f88d0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000002080b86485431b84000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000003c0",
+      "expected": {
+        "intent": "Ordered",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Third",
+            "value": "3"
+          },
+          {
+            "label": "First",
+            "value": "1"
+          },
+          {
+            "label": "Second",
+            "value": "2"
+          }
+        ]
+      }
+    },
+    {
+      "id": "display/visible/never-hidden-ifNotIn-shown-mustMatch-hidden",
+      "description": "never hides the field, ifNotIn shows a value outside the list, mustMatch hides a matching value",
+      "spec": {
+        "section": "Display section > Field format specification > visible",
+        "quote": "never: Never display this field to users. ifNotIn key with an array of values to make the field visible only when the field value does NOT match any of the specified values. mustMatch key with an array of values to make the field always hidden AND check its value against the list."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000020",
+        "function": "visibility(uint256 shown,uint256 hidden,uint256 fee,uint256 legacy)",
+        "args": [
+          "1",
+          "2",
+          "3",
+          "1"
+        ]
+      },
+      "rawTx": "0x02f8ad0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000002080b884706734d60000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000001c0",
+      "expected": {
+        "intent": "Visibility",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Shown",
+            "value": "1"
+          },
+          {
+            "label": "Fee",
+            "value": "3"
+          }
+        ]
+      }
+    },
+    {
+      "id": "display/visible/ifNotIn-hides-listed-value",
+      "description": "ifNotIn hides the field when the value is in the list",
+      "spec": {
+        "section": "Display section > Field format specification > visible",
+        "quote": "ifNotIn key with an array of values to make the field visible only when the field value does NOT match any of the specified values"
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000020",
+        "function": "visibility(uint256 shown,uint256 hidden,uint256 fee,uint256 legacy)",
+        "args": [
+          "1",
+          "2",
+          "0",
+          "0"
+        ]
+      },
+      "rawTx": "0x02f8ad0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000002080b884706734d60000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c0",
+      "expected": {
+        "intent": "Visibility",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Shown",
+            "value": "1"
+          }
+        ]
+      }
+    },
+    {
+      "id": "display/visible/mustMatch-mismatch-is-an-error",
+      "description": "mustMatch with a value outside the list is an error, so the descriptor is not applied",
+      "spec": {
+        "section": "Display section > Field format specification > visible",
+        "quote": "mustMatch key with an array of values to make the field always hidden AND check its value against the list. Wallet should raise an error if the value does not match the list."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000020",
+        "function": "visibility(uint256 shown,uint256 hidden,uint256 fee,uint256 legacy)",
+        "args": [
+          "1",
+          "2",
+          "3",
+          "9"
+        ]
+      },
+      "rawTx": "0x02f8ad0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000002080b884706734d60000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000009c0",
+      "expected": {
+        "match": false,
+        "reason": "mustMatch"
+      }
+    },
+    {
+      "id": "display/params/array-parameter-paired-by-index",
+      "description": "a parameter that points at an array is read at the same index as the element being formatted",
+      "spec": {
+        "section": "Display section > Field format specification > params",
+        "quote": "When a formatter applies to an array, the parameters CAN also reference a path to an array. In that case, wallets should format each element of the array using the parameter value at the same index as the current element being formatted."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000020",
+        "function": "multi(address[] tokens,uint256[] amounts)",
+        "args": [
+          [
+            "0x7730000000000000000000000000000000000001",
+            "0x7730000000000000000000000000000000000002"
+          ],
+          [
+            "1000000",
+            "2000000000000000000"
+          ]
+        ]
+      },
+      "rawTx": "0x02f9012e0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000002080b901048d4d8d18000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000a0000000000000000000000000000000000000000000000000000000000000000200000000000000000000000077300000000000000000000000000000000000010000000000000000000000007730000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000f42400000000000000000000000000000000000000000000000001bc16d674ec80000c0",
+      "expected": {
+        "intent": "Multi",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Amount",
+            "value": "1 AAA"
+          },
+          {
+            "label": "Amount",
+            "value": "2 BBB"
+          }
+        ]
+      }
+    },
+    {
+      "id": "display/id/internal-ids-ignored",
+      "description": "$id keys on a format and on a field change nothing in the output",
+      "spec": {
+        "section": "Common concepts > Key naming convention",
+        "quote": "In all the specification, key names starting with $ are internal and have no value beyond readability of the specification file itself. They should not be used in any function to build the UI to review structured data."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000020",
+        "function": "identified(uint256 amount)",
+        "args": [
+          "5"
+        ]
+      },
+      "rawTx": "0x02f84c0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000002080a4d6a1f8240000000000000000000000000000000000000000000000000000000000000005c0",
+      "expected": {
+        "intent": "Identified",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "Amount",
+            "value": "5"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,142 @@
+{
+  "$schema": "../../../schema/erc7730-tests.schema.json",
+  "$comment": "including.json includes includes/base.json, which includes includes/erc20-interface.json. The runner resolves includes itself.",
+  "specVersion": "2.0.0",
+  "descriptor": "../descriptors/including.json",
+  "dataProvider": {
+    "tokens": {
+      "0x7730000000000000000000000000000000000060": {
+        "symbol": "INC",
+        "decimals": 6,
+        "name": "Including Token"
+      }
+    },
+    "chainNames": {
+      "1": "Ethereum Mainnet"
+    }
+  },
+  "tests": [
+    {
+      "id": "includes/including-file-wins-and-fields-merge-by-path",
+      "description": "the including file's intent replaces the included one, and its params override the included field with the same path",
+      "spec": {
+        "section": "Common concepts > Organizing files",
+        "quote": "When merging, conflicts between common unique keys are resolved by prioritizing the including file. Merge together objects sharing the same path value, overriding parameters of the included file with those of the including file."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000060",
+        "function": "approve(address spender,uint256 value)",
+        "args": [
+          "0x1111111111111111111111111111111111111111",
+          "0xffffffff"
+        ]
+      },
+      "rawTx": "0x02f86d0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000006080b844095ea7b3000000000000000000000000111111111111111111111111111111111111111100000000000000000000000000000000000000000000000000000000ffffffffc0",
+      "expected": {
+        "intent": "Allow",
+        "owner": "Base Owner",
+        "fields": [
+          {
+            "label": "Spender",
+            "value": "0x1111111111111111111111111111111111111111"
+          },
+          {
+            "label": "Amount",
+            "value": "Unlimited INC"
+          }
+        ]
+      }
+    },
+    {
+      "id": "includes/overridden-threshold-below",
+      "description": "below the overridden threshold the amount renders, which proves the included threshold is gone",
+      "spec": {
+        "section": "Common concepts > Organizing files",
+        "quote": "The field formatter value parameter threshold is overridden with value 0xFFFFFFFFFFFFFFFFFF."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000060",
+        "function": "approve(address spender,uint256 value)",
+        "args": [
+          "0x1111111111111111111111111111111111111111",
+          "0xfffffffe"
+        ]
+      },
+      "rawTx": "0x02f86d0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000006080b844095ea7b3000000000000000000000000111111111111111111111111111111111111111100000000000000000000000000000000000000000000000000000000fffffffec0",
+      "expected": {
+        "intent": "Allow",
+        "owner": "Base Owner",
+        "fields": [
+          {
+            "label": "Spender",
+            "value": "0x1111111111111111111111111111111111111111"
+          },
+          {
+            "label": "Amount",
+            "value": "4294.967294 INC"
+          }
+        ]
+      }
+    },
+    {
+      "id": "includes/new-path-appended-after-included-fields",
+      "description": "a field with a path the included file does not have is appended after the included fields",
+      "spec": {
+        "section": "Common concepts > Organizing files",
+        "quote": "Append objects with path values not part of the included file to the resulting array."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000060",
+        "function": "transfer(address to,uint256 value)",
+        "args": [
+          "0x1111111111111111111111111111111111111111",
+          "1000000"
+        ]
+      },
+      "rawTx": "0x02f86d0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000006080b844a9059cbb000000000000000000000000111111111111111111111111111111111111111100000000000000000000000000000000000000000000000000000000000f4240c0",
+      "expected": {
+        "intent": "Transfer",
+        "owner": "Base Owner",
+        "fields": [
+          {
+            "label": "To",
+            "value": "0x1111111111111111111111111111111111111111"
+          },
+          {
+            "label": "Amount",
+            "value": "1 INC"
+          },
+          {
+            "label": "Chain",
+            "value": "Ethereum Mainnet"
+          }
+        ]
+      }
+    },
+    {
+      "id": "includes/context-from-including-file-binds-included-formats",
+      "description": "the deployments of the including file bind the formats of the included file, and the owner comes through two levels of includes",
+      "spec": {
+        "section": "Common concepts > Organizing files",
+        "quote": "A wallet using an ERC-7730 file including another file SHOULD merge those files into a single reference file."
+      },
+      "call": {
+        "chainId": 137,
+        "to": "0x7730000000000000000000000000000000000060",
+        "function": "transfer(address to,uint256 value)",
+        "args": [
+          "0x1111111111111111111111111111111111111111",
+          "1000000"
+        ]
+      },
+      "rawTx": "0x02f86e818980843b9aca00843b9aca00830f424094773000000000000000000000000000000000006080b844a9059cbb000000000000000000000000111111111111111111111111111111111111111100000000000000000000000000000000000000000000000000000000000f4240c0",
+      "expected": {
+        "match": false,
+        "reason": "deployment"
+      }
+    }
+  ]
+}

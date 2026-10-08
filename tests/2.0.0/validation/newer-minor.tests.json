@@ -1,0 +1,35 @@
+{
+  "$schema": "../../../schema/erc7730-tests.schema.json",
+  "$comment": "A rendering case, not a validation case: the descriptor declares a newer MINOR version and must be processed with the 2.0.0 rules.",
+  "specVersion": "2.0.0",
+  "descriptor": "../descriptors/newer-minor.json",
+  "tests": [
+    {
+      "id": "validation/schema-version/newer-minor-is-processed",
+      "description": "a descriptor that declares a newer MINOR of an implemented MAJOR is processed",
+      "spec": {
+        "section": "Versioning",
+        "quote": "If the MAJOR version matches but the descriptor declares a MINOR or PATCH version newer than what the wallet implements, the wallet MUST continue processing the descriptor using its implementation for the appropriate MAJOR version"
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000070",
+        "function": "ping(uint256 n)",
+        "args": [
+          "1"
+        ]
+      },
+      "rawTx": "0x02f84c0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000007080a4773acdef0000000000000000000000000000000000000000000000000000000000000001c0",
+      "expected": {
+        "intent": "Ping",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "N",
+            "value": "1"
+          }
+        ]
+      }
+    }
+  ]
+}

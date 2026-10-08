@@ -1,0 +1,84 @@
+{
+  "$schema": "../../../schema/spec/erc7730-v2.0.0.schema.json",
+  "$comment": "One function per path form: absolute and relative roots, nested tuples, array index, array selectors and slices, bytes slices, container values, constants and literal values.",
+  "context": {
+    "$id": "Spec Tests: paths",
+    "contract": {
+      "deployments": [{ "chainId": 1, "address": "0x7730000000000000000000000000000000000010" }]
+    }
+  },
+  "metadata": {
+    "owner": "Spec Tests",
+    "constants": {
+      "shareToken": "0x7730000000000000000000000000000000000002",
+      "note": "Constant note"
+    }
+  },
+  "display": {
+    "formats": {
+      "nested((address token,(uint256 amount,uint256 min) limits) order)": {
+        "intent": "Nested",
+        "fields": [
+          { "path": "#.order.token", "label": "Token", "format": "raw" },
+          { "path": "order.limits.amount", "label": "Amount", "format": "raw" },
+          { "path": "order.limits.min", "label": "Minimum", "format": "raw" }
+        ]
+      },
+      "arrayIndex(uint256[] values)": {
+        "intent": "Array index",
+        "fields": [
+          { "path": "values.[0]", "label": "First", "format": "raw" },
+          { "path": "values.[-1]", "label": "Last", "format": "raw" }
+        ]
+      },
+      "arrayAll(uint256[] values)": {
+        "intent": "Array all",
+        "fields": [{ "path": "values.[]", "label": "Value", "format": "raw" }]
+      },
+      "arraySlices(uint256[] values)": {
+        "intent": "Array slices",
+        "fields": [
+          { "path": "values.[1:3]", "label": "Middle", "format": "raw" },
+          { "path": "values.[:2]", "label": "Head", "format": "raw" },
+          { "path": "values.[-2:]", "label": "Tail", "format": "raw" }
+        ]
+      },
+      "bytesSliceToken(bytes path,uint256 amount)": {
+        "intent": "Bytes slice as token",
+        "fields": [
+          { "path": "amount", "label": "Amount", "format": "tokenAmount", "params": { "tokenPath": "path.[0:20]" } }
+        ]
+      },
+      "bytesSliceValue(bytes data)": {
+        "intent": "Bytes slice as value",
+        "fields": [
+          { "path": "data.[0:20]", "label": "First address", "format": "addressName" },
+          { "path": "data.[-20:]", "label": "Last address", "format": "addressName" }
+        ]
+      },
+      "container(uint256 x)": {
+        "intent": "Container",
+        "fields": [
+          { "path": "@.from", "label": "From", "format": "addressName" },
+          { "path": "@.value", "label": "Value", "format": "amount" },
+          { "path": "@.to", "label": "To", "format": "raw" },
+          { "path": "@.chainId", "label": "Chain", "format": "chainId" }
+        ]
+      },
+      "constantParam(uint256 amount)": {
+        "intent": "Constant parameter",
+        "fields": [
+          { "path": "amount", "label": "Shares", "format": "tokenAmount", "params": { "token": "$.metadata.constants.shareToken" } }
+        ]
+      },
+      "literalValue(uint256 amount)": {
+        "intent": "Literal value",
+        "fields": [
+          { "value": "Fixed text", "label": "Note", "format": "raw" },
+          { "value": 1000, "label": "Number", "format": "raw" },
+          { "path": "amount", "label": "Amount", "format": "raw" }
+        ]
+      }
+    }
+  }
+}

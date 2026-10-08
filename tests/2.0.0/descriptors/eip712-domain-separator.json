@@ -1,0 +1,19 @@
+{
+  "$schema": "../../../schema/spec/erc7730-v2.0.0.schema.json",
+  "$comment": "Binds by domainSeparator only. The value is keccak256 of the EIP-712 domain {name: Spec Tests, version: 1, chainId: 1, verifyingContract: 0x...0041}.",
+  "context": {
+    "$id": "Spec Tests: EIP-712 domain separator",
+    "eip712": {
+      "domainSeparator": "0x3b4bdfcbd0d3608cf9ba3c266aae2bcd190cc7e7e32341ce7f4309b14717943c"
+    }
+  },
+  "metadata": { "owner": "Spec Tests" },
+  "display": {
+    "formats": {
+      "Ping(uint256 n)": {
+        "intent": "Ping",
+        "fields": [{ "path": "n", "label": "N", "format": "raw" }]
+      }
+    }
+  }
+}

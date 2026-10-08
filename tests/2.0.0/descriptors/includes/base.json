@@ -1,0 +1,8 @@
+{
+  "$schema": "../../../../schema/spec/erc7730-v2.0.0.schema.json",
+  "$comment": "Includes the ERC-20 interface and adds an owner. Included by ../including.json, which is therefore an include of an include.",
+  "includes": "./erc20-interface.json",
+  "metadata": {
+    "owner": "Base Owner"
+  }
+}

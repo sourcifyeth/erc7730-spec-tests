@@ -1,0 +1,58 @@
+{
+  "$schema": "../../../schema/erc7730-tests.schema.json",
+  "$comment": "The descriptor's domainSeparator is keccak256 of the domain {name: Spec Tests, version: 1, chainId: 1, verifyingContract: 0x...0041}, computed with viem hashDomain.",
+  "specVersion": "2.0.0",
+  "descriptor": "../descriptors/eip712-domain-separator.json",
+  "tests": [
+    {
+      "id": "context/eip712/domain-separator-matches",
+      "description": "a domain that hashes to the bound domainSeparator matches",
+      "spec": {
+        "section": "Context section > EIP-712 messages binding context > eip712.domainSeparator",
+        "quote": "Wallet MUST verify that the message EIP-712 Domain hashes (as defined in EIP-712) to the value in eip712.domainSeparator."
+      },
+      "data": {
+        "types": {
+          "EIP712Domain": [
+            { "name": "name", "type": "string" },
+            { "name": "version", "type": "string" },
+            { "name": "chainId", "type": "uint256" },
+            { "name": "verifyingContract", "type": "address" }
+          ],
+          "Ping": [{ "name": "n", "type": "uint256" }]
+        },
+        "primaryType": "Ping",
+        "domain": { "name": "Spec Tests", "version": "1", "chainId": 1, "verifyingContract": "0x7730000000000000000000000000000000000041" },
+        "message": { "n": "7" }
+      },
+      "expected": {
+        "intent": "Ping",
+        "owner": "Spec Tests",
+        "fields": [{ "label": "N", "value": "7" }]
+      }
+    },
+    {
+      "id": "context/eip712/domain-separator-mismatch-no-match",
+      "description": "a domain with another version hashes to another separator and does not match",
+      "spec": {
+        "section": "Context section > EIP-712 messages binding context > eip712.domainSeparator",
+        "quote": "Wallet MUST verify that the message EIP-712 Domain hashes (as defined in EIP-712) to the value in eip712.domainSeparator."
+      },
+      "data": {
+        "types": {
+          "EIP712Domain": [
+            { "name": "name", "type": "string" },
+            { "name": "version", "type": "string" },
+            { "name": "chainId", "type": "uint256" },
+            { "name": "verifyingContract", "type": "address" }
+          ],
+          "Ping": [{ "name": "n", "type": "uint256" }]
+        },
+        "primaryType": "Ping",
+        "domain": { "name": "Spec Tests", "version": "2", "chainId": 1, "verifyingContract": "0x7730000000000000000000000000000000000041" },
+        "message": { "n": "7" }
+      },
+      "expected": { "match": false, "reason": "domainSeparator" }
+    }
+  ]
+}

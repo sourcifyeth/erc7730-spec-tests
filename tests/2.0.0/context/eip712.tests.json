@@ -1,0 +1,233 @@
+{
+  "$schema": "../../../schema/erc7730-tests.schema.json",
+  "specVersion": "2.0.0",
+  "descriptor": "../descriptors/eip712.json",
+  "dataProvider": {
+    "tokens": {
+      "0x7730000000000000000000000000000000000040": { "symbol": "PRM", "decimals": 6, "name": "Permit Token" },
+      "0x7730000000000000000000000000000000000001": { "symbol": "TKN", "decimals": 6, "name": "Spec Token" }
+    },
+    "ensNames": {
+      "0xd8da6bf26964af9d7eed9e03e53415d37aa96045": "vitalik.eth"
+    }
+  },
+  "tests": [
+    {
+      "id": "context/eip712/flat-type-matches",
+      "description": "a message whose encodeType equals the format key matches; extra domain keys beyond the bound ones are allowed",
+      "spec": {
+        "section": "Context section > EIP-712 messages binding context > eip712.domain",
+        "quote": "A wallet MUST verify that each key-value pair in this domain binding matches the values of the domain key-value pairs of the message. Note that the message can have more keys in its domain than those listed in the ERC-7730 file."
+      },
+      "data": {
+        "types": {
+          "EIP712Domain": [
+            { "name": "name", "type": "string" },
+            { "name": "version", "type": "string" },
+            { "name": "chainId", "type": "uint256" },
+            { "name": "verifyingContract", "type": "address" }
+          ],
+          "Permit": [
+            { "name": "owner", "type": "address" },
+            { "name": "spender", "type": "address" },
+            { "name": "value", "type": "uint256" },
+            { "name": "nonce", "type": "uint256" },
+            { "name": "deadline", "type": "uint256" }
+          ]
+        },
+        "primaryType": "Permit",
+        "domain": { "name": "Spec Tests", "version": "1", "chainId": 1, "verifyingContract": "0x7730000000000000000000000000000000000040" },
+        "message": {
+          "owner": "0x1111111111111111111111111111111111111111",
+          "spender": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+          "value": "1500000",
+          "nonce": "3",
+          "deadline": "1893456000"
+        }
+      },
+      "expected": {
+        "intent": "Permit",
+        "owner": "Spec Tests",
+        "fields": [
+          { "label": "Spender", "value": "vitalik.eth" },
+          { "label": "Amount", "value": "1.5 PRM" },
+          { "label": "Nonce", "value": "3" }
+        ]
+      }
+    },
+    {
+      "id": "context/eip712/nested-struct-matches",
+      "description": "a format key with a nested struct type matches and nested paths resolve",
+      "spec": {
+        "section": "Display section > EIP-712 keys",
+        "quote": "For EIP-712, the key names MUST be the string returned by the encodeType function defined in EIP-712 specification applied to the primary type of the message."
+      },
+      "data": {
+        "types": {
+          "EIP712Domain": [
+            { "name": "name", "type": "string" },
+            { "name": "chainId", "type": "uint256" },
+            { "name": "verifyingContract", "type": "address" }
+          ],
+          "Order": [
+            { "name": "asset", "type": "Asset" },
+            { "name": "maker", "type": "address" }
+          ],
+          "Asset": [
+            { "name": "token", "type": "address" },
+            { "name": "amount", "type": "uint256" }
+          ]
+        },
+        "primaryType": "Order",
+        "domain": { "name": "Spec Tests", "chainId": 1, "verifyingContract": "0x7730000000000000000000000000000000000040" },
+        "message": {
+          "asset": { "token": "0x7730000000000000000000000000000000000001", "amount": "2000000" },
+          "maker": "0x1111111111111111111111111111111111111111"
+        }
+      },
+      "expected": {
+        "intent": "Order",
+        "owner": "Spec Tests",
+        "fields": [
+          { "label": "Amount", "value": "2 TKN" },
+          { "label": "Maker", "value": "0x1111111111111111111111111111111111111111" }
+        ]
+      }
+    },
+    {
+      "id": "context/eip712/different-field-order-no-match",
+      "description": "the same fields in another order give another type hash, so the format does not match",
+      "spec": {
+        "section": "Display section > EIP-712 keys",
+        "quote": "This type hash MUST match the hash computed from the display.formats key in use: keccak256(encodeType(typeOf(s))) == keccak256(TYPE_KEY)"
+      },
+      "data": {
+        "types": {
+          "EIP712Domain": [
+            { "name": "name", "type": "string" },
+            { "name": "chainId", "type": "uint256" },
+            { "name": "verifyingContract", "type": "address" }
+          ],
+          "Permit": [
+            { "name": "spender", "type": "address" },
+            { "name": "owner", "type": "address" },
+            { "name": "value", "type": "uint256" },
+            { "name": "nonce", "type": "uint256" },
+            { "name": "deadline", "type": "uint256" }
+          ]
+        },
+        "primaryType": "Permit",
+        "domain": { "name": "Spec Tests", "chainId": 1, "verifyingContract": "0x7730000000000000000000000000000000000040" },
+        "message": {
+          "spender": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+          "owner": "0x1111111111111111111111111111111111111111",
+          "value": "1500000",
+          "nonce": "3",
+          "deadline": "1893456000"
+        }
+      },
+      "expected": { "match": false, "reason": "typeHash" }
+    },
+    {
+      "id": "context/eip712/domain-name-mismatch-no-match",
+      "description": "a domain name that differs from the bound one does not match",
+      "spec": {
+        "section": "Context section > EIP-712 messages binding context > eip712.domain",
+        "quote": "The domain constraint is a json object with simple key-value pairs, describing a set of values that the EIP-712 Domain of the message MUST match."
+      },
+      "data": {
+        "types": {
+          "EIP712Domain": [
+            { "name": "name", "type": "string" },
+            { "name": "chainId", "type": "uint256" },
+            { "name": "verifyingContract", "type": "address" }
+          ],
+          "Permit": [
+            { "name": "owner", "type": "address" },
+            { "name": "spender", "type": "address" },
+            { "name": "value", "type": "uint256" },
+            { "name": "nonce", "type": "uint256" },
+            { "name": "deadline", "type": "uint256" }
+          ]
+        },
+        "primaryType": "Permit",
+        "domain": { "name": "Other Name", "chainId": 1, "verifyingContract": "0x7730000000000000000000000000000000000040" },
+        "message": {
+          "owner": "0x1111111111111111111111111111111111111111",
+          "spender": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+          "value": "1500000",
+          "nonce": "3",
+          "deadline": "1893456000"
+        }
+      },
+      "expected": { "match": false, "reason": "domain" }
+    },
+    {
+      "id": "context/eip712/deployment-chain-mismatch-no-match",
+      "description": "a verifying contract on an unlisted chain does not match",
+      "spec": {
+        "section": "Context section > EIP-712 messages binding context > eip712.deployments",
+        "quote": "The chainId and verifyingContract values in the domain either Match ONE of the deployment option specified in eip712.deployments"
+      },
+      "data": {
+        "types": {
+          "EIP712Domain": [
+            { "name": "name", "type": "string" },
+            { "name": "chainId", "type": "uint256" },
+            { "name": "verifyingContract", "type": "address" }
+          ],
+          "Permit": [
+            { "name": "owner", "type": "address" },
+            { "name": "spender", "type": "address" },
+            { "name": "value", "type": "uint256" },
+            { "name": "nonce", "type": "uint256" },
+            { "name": "deadline", "type": "uint256" }
+          ]
+        },
+        "primaryType": "Permit",
+        "domain": { "name": "Spec Tests", "chainId": 10, "verifyingContract": "0x7730000000000000000000000000000000000040" },
+        "message": {
+          "owner": "0x1111111111111111111111111111111111111111",
+          "spender": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+          "value": "1500000",
+          "nonce": "3",
+          "deadline": "1893456000"
+        }
+      },
+      "expected": { "match": false, "reason": "deployment" }
+    },
+    {
+      "id": "context/eip712/deployment-missing-verifying-contract-no-match",
+      "description": "with a deployments constraint, a domain without verifyingContract does not match",
+      "spec": {
+        "section": "Context section > EIP-712 messages binding context > eip712.deployments",
+        "quote": "When an eip712.deployments constraint is set, the wallet MUST verify that: The message being displayed has both domain.chainId and domain.verifyingContract keys"
+      },
+      "data": {
+        "types": {
+          "EIP712Domain": [
+            { "name": "name", "type": "string" },
+            { "name": "chainId", "type": "uint256" }
+          ],
+          "Permit": [
+            { "name": "owner", "type": "address" },
+            { "name": "spender", "type": "address" },
+            { "name": "value", "type": "uint256" },
+            { "name": "nonce", "type": "uint256" },
+            { "name": "deadline", "type": "uint256" }
+          ]
+        },
+        "primaryType": "Permit",
+        "domain": { "name": "Spec Tests", "chainId": 1 },
+        "message": {
+          "owner": "0x1111111111111111111111111111111111111111",
+          "spender": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+          "value": "1500000",
+          "nonce": "3",
+          "deadline": "1893456000"
+        }
+      },
+      "expected": { "match": false, "reason": "deployment" }
+    }
+  ]
+}

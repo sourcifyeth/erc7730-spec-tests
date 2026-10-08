@@ -1,0 +1,45 @@
+{
+  "$schema": "../../../schema/spec/erc7730-v2.0.0.schema.json",
+  "$comment": "A smart account whose execute functions carry embedded calldata. The embedded calls target inner-token.json (0x...0051). A runner must load every descriptor under tests/<version>/descriptors/ so that it can resolve the inner call.",
+  "context": {
+    "$id": "Spec Tests: embedded calldata",
+    "contract": {
+      "deployments": [{ "chainId": 1, "address": "0x7730000000000000000000000000000000000050" }]
+    }
+  },
+  "metadata": { "owner": "Spec Tests" },
+  "display": {
+    "formats": {
+      "execute(address to,uint256 value,bytes data)": {
+        "intent": "Execute",
+        "fields": [
+          { "path": "to", "label": "Target", "format": "addressName" },
+          { "path": "value", "label": "Value", "format": "amount" },
+          {
+            "path": "data",
+            "label": "Call",
+            "format": "calldata",
+            "params": { "calleePath": "to", "amountPath": "value", "spenderPath": "@.from" }
+          }
+        ]
+      },
+      "executeFixed(bytes data)": {
+        "intent": "Execute on token",
+        "fields": [
+          { "path": "data", "label": "Call", "format": "calldata", "params": { "callee": "0x7730000000000000000000000000000000000051" } }
+        ]
+      },
+      "executeSel(bytes data)": {
+        "intent": "Execute approve",
+        "fields": [
+          {
+            "path": "data",
+            "label": "Call",
+            "format": "calldata",
+            "params": { "callee": "0x7730000000000000000000000000000000000051", "selector": "0x095ea7b3" }
+          }
+        ]
+      }
+    }
+  }
+}
