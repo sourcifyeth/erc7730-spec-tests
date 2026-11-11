@@ -1,7 +1,7 @@
 {
   "$schema": "../../../schema/erc7730-tests.schema.json",
-  "$comment": "Depends on a pending change to the ERC text (ethereum/ERCs pull request 2165: require iteration for two or more array fields, default to bundled). The quote is the draft wording and can change before the merge.",
-  "specVersion": "next",
+  "$comment": "Depends on a pending change to the ERC text and to the v2 schema files (ethereum/ERCs pull request 2165: require iteration for two or more array fields, default to bundled). That change edits the 2.0.0 and 2.1.0 schema files in place, so the case is in the 2.0.0 folder. The quote is the draft wording and can change before the merge.",
+  "specVersion": "2.0.0",
   "descriptor": "../descriptors/group-struct-array.json",
   "tests": [
     {
@@ -9,7 +9,7 @@
       "description": "a group whose path ends with .[] and that has no iteration key shows each element in full before the next element",
       "spec": {
         "section": "Display section > Group format specification > iteration",
-        "quote": "If iteration is absent, the mode is bundled. When the path of the group itself ends with .[], the paths of its fields are concatenated to it, so all the fields of the group iterate over the same array. With the default bundled mode, the wallet displays all the fields of the first element of the array, then all the fields of the second element, and so on."
+        "quote": "A group can also iterate over one array of structs. The path of the group then ends with .[], and each field of the group is a member of the struct. [...] No field of the group has .[] in its own path, so iteration is optional, and the mode is bundled."
       },
       "call": {
         "chainId": 1,
