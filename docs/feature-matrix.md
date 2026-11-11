@@ -6,6 +6,15 @@ The spec text used is the ERC at commit `2528d6a` for 2.0.0 and `master` (2026-1
 
 Status key: **done** = cases exist and pass `npm run check`; **planned** = not written; **open** = blocked on a rendering convention (see [`rendering-conventions.md`](rendering-conventions.md)); **spec issue** = the text and the schema disagree, so the behaviour cannot be required until the spec is fixed.
 
+## next
+
+Behaviour that a pending change to the ERC text defines: [ethereum/ERCs pull request 2165](https://github.com/ethereum/ERCs/pull/2165) (require `iteration` for two or more array fields, default to `bundled`). The cases are advisory until that change merges. Their `spec.quote` is the draft wording.
+
+| Behaviour | Spec section | Cases | Planned | Status |
+|---|---|---|---|---|
+| group whose `path` ends with `.[]`, no `iteration` key → each element in full before the next element | Group format specification > iteration | `display/groups/struct-array-no-iteration` | 0 | done |
+| group with two array fields and no `iteration` key → invalid | Group format specification > iteration | `validation/groups/two-arrays-no-iteration` | 0 | done |
+
 ## 2.1.0
 
 | Behaviour | Spec section | Cases | Planned | Status |
@@ -144,6 +153,7 @@ Status key: **done** = cases exist and pass `npm run check`; **planned** = not w
 
 | | Done | Planned | Open | Optional | Spec issue |
 |---|---|---|---|---|---|
+| next | 2 | 0 | 0 | 0 | 0 |
 | 2.1.0 | 5 | 0 | 0 | 0 | 0 |
 | 2.0.0 | 14 | ≈150 | 5 | 8 | 5 |
 

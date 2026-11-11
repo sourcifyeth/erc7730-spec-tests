@@ -1,0 +1,21 @@
+{
+  "$schema": "https://github.com/ethereum/ERCs/blob/master/assets/erc-7730/erc7730-v2.schema.json",
+  "$comment": "A group with no path, two array fields and no iteration key. Invalid after ethereum/ERCs pull request 2165 (require iteration for two or more array fields, default to bundled). The $schema is the v2 alias, so the missing key is the only reason to reject the descriptor.",
+  "context": { "contract": { "deployments": [{ "chainId": 1, "address": "0x7730000000000000000000000000000000000081" }] } },
+  "metadata": { "owner": "Spec Tests" },
+  "display": {
+    "formats": {
+      "payMany(address[] recipients,uint256[] amounts)": {
+        "intent": "Pay many",
+        "fields": [
+          {
+            "fields": [
+              { "path": "recipients.[]", "label": "To", "format": "raw" },
+              { "path": "amounts.[]", "label": "Amount", "format": "raw" }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
