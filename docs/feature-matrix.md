@@ -100,6 +100,8 @@ Status key: **done** = cases exist and pass `npm run check`; **planned** = not w
 | group with `path` prefixes child paths | Group format specification | | 2 | | planned |
 | group `iteration: sequential` and `bundled` | Group format specification > iteration | | 2 | 0 | planned |
 | `bundled` with arrays of different sizes → error | Group format specification | | 1 | | planned (SHOULD → optional) |
+| group whose `path` ends with `.[]`, no `iteration` key → each element in full before the next element | Group format specification > iteration | `display/groups/struct-array-no-iteration` | 0 | 9 | done; depends on the pending [ethereum/ERCs pull request 2165](https://github.com/ethereum/ERCs/pull/2165) (require `iteration` for two or more array fields, default to `bundled`), which edits the v2 schema files in place |
+| group with two array fields and no `iteration` key → invalid | Group format specification > iteration | `validation/groups/two-arrays-no-iteration` | 0 | 0 | done; depends on the same pending pull request |
 | field order follows descriptor order | Group format specification | | 1 | | planned |
 | `visible: never`, `always` | Field format specification > visible | | 2 | 145 | planned |
 | `visible: optional` | Field format specification > visible | | 1 | | optional (MAY) |
@@ -145,7 +147,7 @@ Status key: **done** = cases exist and pass `npm run check`; **planned** = not w
 | | Done | Planned | Open | Optional | Spec issue |
 |---|---|---|---|---|---|
 | 2.1.0 | 5 | 0 | 0 | 0 | 0 |
-| 2.0.0 | 14 | ≈150 | 5 | 8 | 5 |
+| 2.0.0 | 16 | ≈150 | 5 | 8 | 5 |
 
 ## Spec issues to file
 

@@ -1,0 +1,29 @@
+{
+  "$schema": "../../../schema/spec/erc7730-v2.0.0.schema.json",
+  "$comment": "A group whose path ends with .[] and that has no iteration key. The behaviour comes from a pending change to the ERC text (ethereum/ERCs pull request 2165: require iteration for two or more array fields, default to bundled). That change edits the v2 schema line in place, so this descriptor points at a v2 schema and not at the 3.0.0-next draft.",
+  "context": {
+    "$id": "Spec Tests: group on an array of structs",
+    "contract": {
+      "deployments": [{ "chainId": 1, "address": "0x7730000000000000000000000000000000000080" }]
+    }
+  },
+  "metadata": {
+    "owner": "Spec Tests"
+  },
+  "display": {
+    "formats": {
+      "payMany((address to,uint256 amount)[] payments)": {
+        "intent": "Pay many",
+        "fields": [
+          {
+            "path": "payments.[]",
+            "fields": [
+              { "path": "to", "label": "To", "format": "raw" },
+              { "path": "amount", "label": "Amount", "format": "raw" }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

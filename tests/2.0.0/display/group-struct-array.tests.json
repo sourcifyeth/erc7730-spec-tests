@@ -1,0 +1,56 @@
+{
+  "$schema": "../../../schema/erc7730-tests.schema.json",
+  "$comment": "Depends on a pending change to the ERC text and to the v2 schema files (ethereum/ERCs pull request 2165: require iteration for two or more array fields, default to bundled). That change edits the 2.0.0 and 2.1.0 schema files in place, so the case is in the 2.0.0 folder. The quote is the draft wording and can change before the merge.",
+  "specVersion": "2.0.0",
+  "descriptor": "../descriptors/group-struct-array.json",
+  "tests": [
+    {
+      "id": "display/groups/struct-array-no-iteration",
+      "description": "a group whose path ends with .[] and that has no iteration key shows each element in full before the next element",
+      "spec": {
+        "section": "Display section > Group format specification > iteration",
+        "quote": "A group can also iterate over one array of structs. The path of the group then ends with .[], and each field of the group is a member of the struct. [...] No field of the group has .[] in its own path, so iteration is optional, and the mode is bundled."
+      },
+      "call": {
+        "chainId": 1,
+        "to": "0x7730000000000000000000000000000000000080",
+        "function": "payMany((address to,uint256 amount)[] payments)",
+        "args": [
+          [
+            {
+              "to": "0x1111111111111111111111111111111111111111",
+              "amount": "100"
+            },
+            {
+              "to": "0x2222222222222222222222222222222222222222",
+              "amount": "50"
+            }
+          ]
+        ]
+      },
+      "rawTx": "0x02f8ed0180843b9aca00843b9aca00830f424094773000000000000000000000000000000000008080b8c4b1f56142000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000020000000000000000000000001111111111111111111111111111111111111111000000000000000000000000000000000000000000000000000000000000006400000000000000000000000022222222222222222222222222222222222222220000000000000000000000000000000000000000000000000000000000000032c0",
+      "expected": {
+        "intent": "Pay many",
+        "owner": "Spec Tests",
+        "fields": [
+          {
+            "label": "To",
+            "value": "0x1111111111111111111111111111111111111111"
+          },
+          {
+            "label": "Amount",
+            "value": "100"
+          },
+          {
+            "label": "To",
+            "value": "0x2222222222222222222222222222222222222222"
+          },
+          {
+            "label": "Amount",
+            "value": "50"
+          }
+        ]
+      }
+    }
+  ]
+}

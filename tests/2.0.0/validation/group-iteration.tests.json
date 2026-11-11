@@ -1,0 +1,18 @@
+{
+  "$schema": "../../../schema/erc7730-tests.schema.json",
+  "$comment": "Descriptors an implementation must accept or reject under a pending change to the ERC text and to the v2 schema files (ethereum/ERCs pull request 2165: require iteration for two or more array fields, default to bundled). That change edits the 2.0.0 and 2.1.0 schema files in place, so the case is in the 2.0.0 folder. The quote is the draft wording and can change before the merge. The error category is informative; only valid is compared.",
+  "kind": "validation",
+  "specVersion": "2.0.0",
+  "tests": [
+    {
+      "id": "validation/groups/two-arrays-no-iteration",
+      "description": "a group with two array fields and no iteration key makes the descriptor invalid",
+      "spec": {
+        "section": "Display section > Group format specification > iteration",
+        "quote": "iteration is REQUIRED if two or more fields of the group have a path that contains .[]."
+      },
+      "descriptor": "./descriptors/group-two-arrays-no-iteration.json",
+      "expected": { "valid": false, "error": "schema" }
+    }
+  ]
+}
